@@ -37,6 +37,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'book',             # Aplikasi untuk menyimpan data buku
+    'main',             # Rachel Heningtyas Zanetta Erari (2206081944)
+    'pinjam_buku',      # Harjuno Abdullah (2206814053)
+    'rekomendasi',      # Muhammad Fakhri Robbani (2206026252)
+    'review_buku',      # Rakha Fadil Atmojo (2206082985)
+    'wishlist',         # Zuhdy Nadhif Ayyasy (2206081212)
 ]
 
 MIDDLEWARE = [
@@ -54,7 +60,7 @@ ROOT_URLCONF = 'readnow.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
