@@ -24,6 +24,13 @@ class Book(models.Model):
     publish_day = models.IntegerField(null=True, blank=True)
     publish_month = models.IntegerField(null=True, blank=True)
     publish_year = models.IntegerField(null=True, blank=True)
+    status = models.CharField(
+        max_length=10,
+        choices=[
+            ("Available", "a"),
+            ("Borrowed", "b")
+        ], default="Available"
+    )
 
     def get_indices_as_list(self):
         # Memisahkan string berdasarkan koma dan mengonversi ke integer
