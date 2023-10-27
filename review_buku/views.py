@@ -9,8 +9,8 @@ from django.urls import reverse
 from book.models import Book
 import datetime
 
-def show_review(request):
-    review_data = Review.objects.all()
+def show_review(request, id):
+    review_data = Review.objects.filter(book_id=id) 
     review_form = ReviewForm()
     user = request.user
 
@@ -24,7 +24,7 @@ def show_review(request):
 
 def review_json(request):
     data = Review.objects.all()
-    return HttpResponse(serializers.serialize('json', data), content_type='application/json')
+    return HttpResponse(serializers.serialize('json', data))
 
 @login_required(login_url='/login/')
 @csrf_exempt
