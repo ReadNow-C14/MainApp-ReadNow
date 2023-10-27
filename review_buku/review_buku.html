@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Reviews</title>
+</head>
+<body>
+    <h1>Book Reviews</h1>
+    
+    {% if user_loggedin %}
+        <p>Welcome, {{ user_loggedin }}!</p>
+    {% else %}
+        <p>You are not logged in.</p>
+    {% endif %}
+    
+    <h2>Reviews</h2>
+    
+    <ul>
+        <li>Item 1</li>
+        <li>Item 2</li>
+        <li>Item 3</li>
+    </ul>
+    
+    
+    <h2>Add a Review</h2>
+    <form id="reviewForm" method="post" action="{% url 'add_review' %}">
+        {% csrf_token %}
+        {{ review_form.as_p }}
+        <button type="submit">Submit Review</button>
+    </form>
+    
+    <script>
+        // You can add JavaScript here if needed.
+    </script>
+</body>
+</html>
