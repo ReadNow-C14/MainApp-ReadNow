@@ -1,8 +1,8 @@
-from django.urls import path
+from django.urls import path, include
 from book.views import *
 
-app_name = 'book'
+app_name = "book"
 
 urlpatterns = [
-    # path('', show_main, name='show_main'),
+    path("",get_books, name="get_books"),
 ]
