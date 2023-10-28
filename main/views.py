@@ -1,4 +1,5 @@
 import datetime
+import math
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
@@ -11,17 +12,24 @@ from django.core import serializers
 from django.shortcuts import redirect
 from book.models import Book
 
-@login_required(login_url='/login')
+#@login_required(login_url='/login')
 def show_main(request):
-    books = Book.objects.filter(pk=2)
+    books = Book.objects.all()  # Retrieve all books from the database
+
+    rows = math.ceil(len(books) / 3)
+    bookdata = []
+
+    for i in range(1, rows + 1):
+        bookdata.append(books[(i - 1) * 3: i * 3])
+
     context = {
         'name': request.user.username,
         'app': 'ReadNow',
         'class': 'PBP C',
-        'books': books,
+        'bookdata': bookdata,  # Pass the organized book data to the template
     }
 
-    return render(request, "main.html", context)
+    return render(request, 'main.html', context)
 
 def register(request):
     form = UserCreationForm()
@@ -51,6 +59,17 @@ def login_user(request):
 def logout_user(request):
     logout(request)
     return redirect('main:login')
+
+def book_info(request, book_id):
+    try:
+        book = Book.objects.get(pk=book_id)
+    except Book.DoesNotExist:
+        return render(request, 'not_found.html')
+
+    context = {
+        'book': book,
+    }
+    return render(request, 'book_info.html', context)
 
 def show_xml(request):
     data = Book.objects.all()

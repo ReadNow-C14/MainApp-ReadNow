@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>{{ book.title }}</h1>
+    <img src="{{ book.image_url }}" alt="{{ book.title }} Cover" class="book-image mb-4">
+    <p>Author: {{ book.authors }}</p>
+    <p>Number of Pages: {{ book.num_of_pages }}</p>
+    <p>ISBN: {{ book.isbn }}</p>
+    <p>Publisher: {{ book.publisher }}</p>
+    <p>Rating: {{ book.rating}} </p>
+
+    <a href="{% url 'rekomendasi:similar_books' book.pk %}">
+        <button class="bg-blue-500 text-white py-2 px-4 rounded-md">Rekomendasi</button> 
+    </a>
+{% endblock content %}
