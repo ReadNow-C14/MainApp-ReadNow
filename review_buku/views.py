@@ -1,40 +1,42 @@
-from django.http import HttpResponseNotFound, HttpResponseRedirect, HttpResponse, JsonResponse
+from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
+from book.models import Book
 from review_buku.forms import ReviewForm
 from review_buku.models import Review
 from django.core import serializers
-from django.shortcuts import render
-from django.urls import reverse
-from book.models import Book
+from django.shortcuts import redirect, render
+from django.contrib import messages
 import datetime
 
-def show_review(request, id):
-    review_data = Review.objects.filter(book_id=id) 
-    review_form = ReviewForm()
-    user = request.user
+def reviews_for_book(request, book_id):
+    book = Book.objects.get(id=book_id)
+    reviews = Review.objects.filter(book=book)
+    form = ReviewForm()
+    return render(request, 'review_buku.html', {'reviews': reviews, 'book': book, 'form': form})
 
-    context = {
-        'list_of_review': review_data,
-        'review_form': review_form,
-        'user_loggedin': user.username,
-    }
-    
-    return render(request, 'review_buku.html', context)
-
-def review_json(request):
+def review_json(request, product_id):
     data = Review.objects.all()
     return HttpResponse(serializers.serialize('json', data))
 
 @login_required(login_url='/login/')
 @csrf_exempt
-def add_review_ajax(request):
+def submit_review(request, book_id):
+    url = request.META.get('HTTP_REFERER')
     if request.method == 'POST':
-        comment = request.POST.get('comment')
-        book_rev = Book.objects.get(pk=request.POST.get("id"))
-        user = request.user
-        date = datetime.date.today()
-        new_review = Review(user=user, book=book_rev, comment=comment, date=date)
-        new_review.save()
-        return HttpResponse(b"ADDED", status=201)
-    return HttpResponseNotFound()
+        try:
+            reviews = Review.objects.get(user__id=request.user.id, book__id=book_id)
+            form = ReviewForm(request.POST, instance=reviews)
+        except Review.DoesNotExist:
+            form = ReviewForm(request.POST)
+
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.user = request.user
+            review.book_id = book_id
+            review.save()
+            messages.success(request, 'Thank you! Your review has been submitted.')
+            return redirect(url)
+        else:
+            messages.error(request, 'There was an error with your submission.')
+            return redirect(url)
