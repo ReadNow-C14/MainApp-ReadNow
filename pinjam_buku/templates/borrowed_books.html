@@ -1,26 +1,79 @@
 {% extends 'base.html' %}
-
 {% load static %}
-{% block meta %}
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha384-KyZXEAg3QhqLMpG8r+J4jsl5c9zdLKaUk5Ae5f5b1bw6AUn5f5v8FZJoMxm6f5cH1" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
-{% endblock meta %}
-
 {% block content %}
 
-<body>
-    <p id="total_borrowed_books">Saat ini Anda sedang meminjam {{ total_borrowed_books }} buku</p>
+<!-- Font Montserrat -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap" rel="stylesheet">
 
-    <div class="row" id="borrowed_book_cards"></div>
+<!-- External Stylesheet -->
+<link rel="stylesheet" type="text/css" href=" {% static 'admin/css/styles.css' %} ">
 
-</body>
+<!-- Bootstrap -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha384-KyZXEAg3QhqLMpG8r+J4jsl5c9zdLKaUk5Ae5f5b1bw6AUn5f5v8FZJoMxm6f5cH1" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
 
+<style>
+    .book-grid {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: left;
+        gap: 30px; /* Atur jarak antara kartu buku */
+    }
+
+    .card {
+        width: 200px;
+        /* Atur jarak antara kartu buku jika masih ada ruang kosong di baris */
+        margin-bottom: 20px;
+    }
+</style>
+
+<!-- Content -->
+<div class="background-purple" style="padding-bottom: 80px;">
+    <nav class="navbar navbar-expand-lg">
+        <div class="container mt-3">
+            <a class="navbar-brand d-flex align-items-center justify-content-center" style="color:white; font-family: 'Montserrat', sans-serif;">
+                <img src="{% static 'icon-recommendation.png' %}" alt="Logo" width="50" height="40" class="d-inline-block align-text-top me-1 book-image">
+                Borrowed Book</a>
+        </div>
+    </nav>
+
+    <section class="hero" stye="padding:80px 0;">
+        <div class="container">
+            <div class="row">
+                <div class="row d-flex align-items-center justify-content-center">
+                    <div class ="col-md-6">
+                        <div class="text" style="font-family: 'Montserrat', sans-serif; font-size:40px; line-height: 50px; margin-top:30px">
+                            You are currently borrowing {{ total_borrowed_books }} books <br> <p style="font-size: 20px; line-height: 30px; margin-top: 20px;"></p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <img class="icon-book-3d" src="{% static '4.png' %}" alt="book-icon" width="450" height="350" style="margin-left:80px;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<div class="container mt-5 mb-5">
+    <div class="book-grid" id="borrowed_book_cards"></div>
+</div>
+
+<hr>
+<div class="d-flex align-items-center justify-content-center">
+    <p>Don't forget to return the borrowed books</p>
+</div>
+
+<!-- JavaScript code -->
 <script>
     async function getBorrowedBooks() {
         return fetch("{% url 'pinjam_buku:get_borrowed_book_json' %}").then((res) => res.json())
     }
+
     async function refreshBorrowedBooks() {
         const borrowedBooks = await getBorrowedBooks()
         const borrowedBooksCardElement = document.getElementById("borrowed_book_cards");
@@ -28,27 +81,13 @@
 
         borrowedBooks.forEach((book) => {
             const card = document.createElement("div");
-            card.classList.add("col-12", "col-md-6", "col-lg-3");
 
             card.innerHTML = `
-                <div class="card text-center">
-                    <div class="card-header">
-                        <h5 class="card-title">
-                            ${ book.fields.title }
-                        </h5>
-                    </div>
+                <div class="card" style="width: 250px;">
+                    <img src="${ book.fields.image_url }" alt="" class="card-img-top" height="180px" style="object-fit: cover;">
                     <div class="card-body">
-                        <img src="${ book.fields.image_url }" alt=""><br>
-                        <table>
-                            <tr>Pages</tr>
-                            <tr>: ${ book.fields.num_of_pages }</tr>
-                        </table>
-                        <table>
-                            <tr>ISBN Number</tr>
-                            <tr>: ${ book.fields.isbn }</tr>
-                        </table>
-                    </div>
-                    <div class="card-footer">
+                        <h5 class="card-title" style="font-size: 12px;">${ book.fields.title }</h5>
+                        <p class="card-text" style="font-size: 10px;">${ book.fields.authors }</p>
                         <button type="button" class="btn btn-danger" id="button_remove" data-bookid="${book.pk}" onclick="returnBook(${book.pk})">Return Book</button>
                     </div>
                 </div>
@@ -56,18 +95,17 @@
 
             borrowedBooksCardElement.appendChild(card);
         });
-        const totalBorrowedBooks = document.getElementById("total_borrowed_books");
-        totalBorrowedBooks.textContent = `Saat ini Anda sedang meminjam ${borrowedBooks.length} buku`;
+        const totalBorrowedBooks = document.querySelector(".font-weight-bold");
+        totalBorrowedBooks.textContent = `You are currently borrowing ${borrowedBooks.length} books`;
     }
     refreshBorrowedBooks()
 
     function returnBook(pk) {
-        console.log(pk)
         fetch(`/pinjam/return-book-ajax/${pk}`, {
-            method: 'DELETE',
+            method: 'POST',
         }).then(refreshBorrowedBooks);
-        alert("Buku telah dikembalikan");
+        alert("The book has been returned");
     }
-
 </script>
+
 {% endblock content %}
