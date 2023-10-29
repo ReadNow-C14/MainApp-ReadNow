@@ -31,6 +31,8 @@ class Book(models.Model):
             ("Borrowed", "b")
         ], default="Available"
     )
+    return_date = models.DateField(
+        auto_now=False, auto_now_add=False, null=True, blank=True)
 
     def get_indices_as_list(self):
         # Memisahkan string berdasarkan koma dan mengonversi ke integer
