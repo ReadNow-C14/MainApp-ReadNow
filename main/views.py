@@ -26,8 +26,7 @@ def show_main(request):
     context = {
         'name': request.user.username,
         'app': 'ReadNow',
-        'class': 'PBP C',
-        'bookdata': bookdata,  # Pass the organized book data to the template
+        'bookdata': bookdata,
     }
 
     return render(request, 'main.html', context)
