@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<body>
+    <p id="total-products">Saat ini Anda sedang meminjam {{ total_borrowed_books }} buku</p>
+    <ul>
+        {% for borrowed_book in borrowed_books %}
+            <li>{{ borrowed_book.book.title }} - Tanggal Pengembalian: {{ borrowed_book.return_date }}</li>
+        {% empty %}
+            <li>Anda belum meminjam buku apapun.</li>
+        {% endfor %}
+        </ul>
+    <div class="row" id="borrowed_book_cards"></div>
+
+</body>
+
+<script>
+        async function getBorrowedBooks() {
+        return fetch("{% url 'pinjam_buku:get_borrowed_book_json' %}").then((res) => res.json())
+    }
+    async function refreshBorrowedBooks() {
+        const borrowedBooks = await getBorrowedBooks();
+        const borrowedBookCardsElement = document.getElementById("borrowed_book_cards");
+        borrowedBookCardsElement.innerHTML = "";
+
+        borrowedBooks.forEach((item, index) => {
+            const card = document.createElement("div");
+            card.classList.add("col-md-4", "mb-3", "card");
+
+            card.innerHTML = `
+                <li class="book-details bg-white p-4 shadow-md rounded-md">
+                    <h3 class="text-lg font-semibold">${item.fields.title}</h3>
+                    <p class="text-gray-600">Author: ${item.fields.authors}</p>
+                    <p class="text-gray-600">Number of Pages: ${item.fields.num_of_pages }</p>
+                    <p class="text-gray-600">Rating: ${item.fields.rating }}</p>
+                    <img src="${item.fields.image_url}" alt="${item.fields.title } Cover" class="book-image mb-4">
+                    <div class="btn-container">
+                        <button class="btn btn-danger" onClick="returnBook(${item.pk})">Return Book</button>
+                    </div>
+                </li>
+            `;
+        });
+    }
+
+    refreshProducts()
+
+    function returnBook(pk) {
+        fetch(`/return_book_ajax/${pk}`, {
+            method: 'DELETE',
+        }).then(refreshProducts);
+        alert("Buku telah dikembalikan");
+    }
+
+</script>
+{% endblock content %}
