@@ -37,7 +37,7 @@
         <div class="container mt-3">
             <a class="navbar-brand d-flex align-items-center justify-content-center" style="color:white; font-family: 'Montserrat', sans-serif;">
                 <img src="{% static 'icon-recommendation.png' %}" alt="Logo" width="50" height="40" class="d-inline-block align-text-top me-1 book-image">
-                Borrowed Book</a>
+                Borrowed Books</a>
         </div>
     </nav>
 
@@ -46,8 +46,8 @@
             <div class="row">
                 <div class="row d-flex align-items-center justify-content-center">
                     <div class ="col-md-6">
-                        <div class="text" style="font-family: 'Montserrat', sans-serif; font-size:40px; line-height: 50px; margin-top:30px">
-                            You are currently borrowing {{ total_borrowed_books }} books <br> <p style="font-size: 20px; line-height: 30px; margin-top: 20px;"></p>
+                        <div id="total_borrowed_books" class="text" style="font-family: 'Montserrat', sans-serif; font-size:40px; line-height: 50px; margin-top:30px">
+                            You are currently borrowing {{ total_borrowed_books }} books <br>
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -86,8 +86,9 @@
                 <div class="card" style="width: 250px;">
                     <img src="${ book.fields.image_url }" alt="" class="card-img-top" height="180px" style="object-fit: cover;">
                     <div class="card-body">
-                        <h5 class="card-title" style="font-size: 12px;">${ book.fields.title }</h5>
-                        <p class="card-text" style="font-size: 10px;">${ book.fields.authors }</p>
+                        <h5 class="card-title" style="font-size: 20px;">${ book.fields.title }</h5>
+                        <p class="card-text" style="font-size: 13px;">${ book.fields.authors }</p>
+                        <p class="card-text" style="font-size: 13px;">Return Date: ${ book.fields.return_date }</p>
                         <button type="button" class="btn btn-danger" id="button_remove" data-bookid="${book.pk}" onclick="returnBook(${book.pk})">Return Book</button>
                     </div>
                 </div>
@@ -95,7 +96,7 @@
 
             borrowedBooksCardElement.appendChild(card);
         });
-        const totalBorrowedBooks = document.querySelector(".font-weight-bold");
+        const totalBorrowedBooks = document.getElementById("total_borrowed_books");
         totalBorrowedBooks.textContent = `You are currently borrowing ${borrowedBooks.length} books`;
     }
     refreshBorrowedBooks()
