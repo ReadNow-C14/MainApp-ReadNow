@@ -30,7 +30,8 @@ def borrowed_books(request):
 @login_required(login_url='/login')
 def get_borrowed_book_json(request):
     borrowed_books = BorrowedBook.objects.filter(user=request.user)
-    return HttpResponse(serializers.serialize('json', borrowed_books))
+    books = [borrowed.book for borrowed in borrowed_books]
+    return HttpResponse(serializers.serialize("json",books),content_type="application/json")
 
 @csrf_exempt
 def borrow_book_ajax(request, id):
@@ -49,8 +50,11 @@ def borrow_book_ajax(request, id):
 
     return HttpResponseNotFound()
 
+@csrf_exempt
 def return_book_ajax(request, id):
     borrowed_book = BorrowedBook.objects.get(pk=id)
     borrowed_book.delete()
-    response = HttpResponseRedirect(reverse("pinjam_buku:borrowed_books"))
-    return response
+    book = Book.objects.get(id=id)
+    book.status = "Available"
+    book.save()
+    return HttpResponse(b"RETURNED", status=201)
