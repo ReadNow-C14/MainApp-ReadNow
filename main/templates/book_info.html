@@ -1,48 +1,59 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<body>
-    <h1>{{ book.title }}</h1>
-    <img src="{{ book.image_url }}" alt="{{ book.title }} Cover" class="book-image mb-4">
-    <p>Author: {{ book.authors }}</p>
-    <p>Number of Pages: {{ book.num_of_pages }}</p>
-    <p>ISBN: {{ book.isbn }}</p>
-    <p>Publisher: {{ book.publisher }}</p>
-    <p>Rating: {{ book.rating}} </p>
-    <p id="status_buku">Status: {{ book.status }}</p>
+    <div>
+    <a href="javascript:history.go(-1);" class="btn btn-link text-dark ml-6">Back</a>
+    </div>  
+    <div class="container mx-auto text-center mt-8">  
+        <h1 class="text-2xl font-bold mb-4">{{ book.title }}</h1>
+        <div class="flex justify-center">
+            <img src="{{ book.image_url }}" alt="{{ book.title }} Cover" class="book-image mb-4">
+        </div>
+        <p class="mb-2">Author: {{ book.authors }}</p>
+        <p class="mb-2">Number of Pages: {{ book.num_of_pages }}</p>
+        <p class="mb-2">ISBN: {{ book.isbn }}</p>
+        <p class="mb-2">Publisher: {{ book.publisher }}</p>
+        <p class="mb-2">Rating: {{ book.rating }}</p>
+        <p id="status_buku" class="mb-4">Status: {{ book.status }}</p>
 
-    <a href="{% url 'rekomendasi:similar_books' book.pk %}">
-        <button class="bg-blue-500 text-white py-2 px-4 rounded-md">Rekomendasi</button> 
-    </a>
+        <div class="flex justify-center">
+            <a href="{% url 'rekomendasi:similar_books' book.pk %}">
+                <button class="btn btn-dark mx-4 mb-4 rounded">Recommendation</button>
+            </a>
+            <a href="{% url 'reviews_for_book' book.pk %}">
+                <button class="btn btn-dark mx-4 mb-4 rounded">Book Review</button>
+            </a>
+        </div>
+    </div>
 
     {% if user.is_authenticated %}
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="exampleModalLabel">Pinjam Buku</h1>
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Borrow a Book</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form id="form" onsubmit="return false;">
                         {% csrf_token %}
                         <div class="mb-3">
-                            <label for="returnDate">Tanggal Pengembalian</label>
+                            <label for="returnDate">Return Date</label>
                             <input type="date" class="form-control" id="returnDate" name="return_date">
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" id="button_borrow" data-bs-dismiss="modal" data-book-id="{{ book.pk }}">Borrow Book</button>
+                    <button type="button" class="btn btn btn-dark mx-2 rounded" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn btn-dark mx-4 rounded" id="button_borrow" data-bs-dismiss="modal" data-book-id="{{ book.pk }}">Borrow This Book</button>
                 </div>
             </div>
         </div>
     </div>
-
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" id="button_pinjam"></button>
+    <div class="flex justify-center">
+        <button type="button" class="btn btn-dark mx-4 rounded" data-bs-toggle="modal" data-bs-target="#exampleModal">Borrow This Book</button>
+    </div>
     {% endif %}
-
 </body>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -54,22 +65,20 @@
     }
 
     async function refreshBook() {
+        console.log("masuk fungsi refresh")
         const book = await getBooks();
-        console.log(book[0].fields.status)
-
         const bookStatus = document.getElementById("status_buku");
-        const buttonPinjam = document.getElementById('button_pinjam');
-        const borrowButton = document.getElementById('button_borrow');
+        if (book.status === 'Available') {
+            borrowButton.textContent = `Status: Available`;
+        } else if (book.status === 'Borrowed') {
+            borrowButton.textContent = `Status: Borrowed`;
+        }
 
-        if (book[0].fields.status === 'Available') {
-            bookStatus.textContent = `Status: Available`;
-            borrowButton.textContent = 'Borrow Book';
-            buttonPinjam.textContent = 'Borrow Book';
-        } else {
-            bookStatus.textContent = `Status: Borrowed`;
-            borrowButton.textContent = 'Return Book';
-            buttonPinjam.textContent = 'Borrowed';
-            buttonPinjam.disabled = true;
+        const borrowButton = document.getElementById('button_borrow');
+        if (book.status === 'Available') {
+            borrowButton.textContent = 'Pinjam Buku';
+        } else if (book.status === 'Borrowed') {
+            borrowButton.textContent = 'Kembalikan Buku';
         }
     }
     refreshBook();
@@ -91,6 +100,8 @@
         const bookId = document.querySelector('#button_borrow').getAttribute('data-book-id'); 
         borrowBook(bookId);
     }
+
+
 
 </script>
 
