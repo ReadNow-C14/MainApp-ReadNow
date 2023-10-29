@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, reverse
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect, JsonResponse
 from django.core import serializers
 from book.models import Book
+from wishlist.models import Wishlist
 from .models import BookRecommendation
 from django.views.decorators.csrf import csrf_exempt
 
@@ -26,6 +27,21 @@ def similar_books(request, id):
 
     context = {"main_book" : book,
                'recommendation_books': recommendation_books}
+    
+    if request.user.is_authenticated:
+        # do something
+        wishlists = Wishlist.objects.filter(user=request.user)
+        recommendation_wishlist = []
+
+        for wishlist in wishlists:
+            if not has_recommendations(wishlist.book):
+                init_recommend_book(wishlist.book)
+            recommendation = BookRecommendation.objects.filter(source_book=wishlist.book)[0]
+            recommendation_wishlist.append(recommendation)
+        
+        context['recommendation_wishlist'] = recommendation_wishlist
+
+        
     return render(request, 'similar_books.html', context)
 
 def init_recommend_book(source_book):
