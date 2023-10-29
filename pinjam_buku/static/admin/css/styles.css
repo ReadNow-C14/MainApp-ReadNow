@@ -1,5 +1,5 @@
 .background-purple{
-    background-image: url('/static/background-bluee.jpg');
+    background-image: url('/static/background-purplee.png');
     background-size: cover;
     background-position: center;
     padding-bottom: 50px;
@@ -7,9 +7,16 @@
 }
 
 .book-grid {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr); 
-    gap: 25px; 
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: left;
+    gap: 30px; /* Atur jarak antara kartu buku */
+}
+
+.card {
+    width: 200px;
+    /* Atur jarak antara kartu buku jika masih ada ruang kosong di baris */
+    margin-bottom: 20px;
 }
 
 .card-title {

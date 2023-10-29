@@ -1,5 +1,5 @@
 .background-purple{
-    background-image: url('/static/background-purplee.png');
+    background-image: url('/static/background-bluee.jpg');
     background-size: cover;
     background-position: center;
     padding-bottom: 50px;
@@ -9,7 +9,7 @@
 .book-grid {
     display: grid;
     grid-template-columns: repeat(6, 1fr); 
-    gap: 25px; 
+    gap: 20px; 
 }
 
 .card-title {

@@ -38,7 +38,7 @@
                     <form id="form" onsubmit="return false;">
                         {% csrf_token %}
                         <div class="mb-3">
-                            <label for="returnDate">Return Date</label>
+                            <label for="returnDate">Set Return Date</label>
                             <input type="date" class="form-control" id="returnDate" name="return_date">
                         </div>
                     </form>
@@ -65,27 +65,27 @@
     }
 
     async function refreshBook() {
-        console.log("masuk fungsi refresh")
         const book = await getBooks();
-        const bookStatus = document.getElementById("status_buku");
-        if (book.status === 'Available') {
-            borrowButton.textContent = `Status: Available`;
-        } else if (book.status === 'Borrowed') {
-            borrowButton.textContent = `Status: Borrowed`;
-        }
+        console.log(book[0].fields.status)
 
+        const bookStatus = document.getElementById("status_buku");
+        const buttonPinjam = document.getElementById('button_pinjam');
         const borrowButton = document.getElementById('button_borrow');
-        if (book.status === 'Available') {
-            borrowButton.textContent = 'Pinjam Buku';
-        } else if (book.status === 'Borrowed') {
-            borrowButton.textContent = 'Kembalikan Buku';
+
+        if (book[0].fields.status === 'Available') {
+            bookStatus.textContent = 'Status: Available';
+            borrowButton.textContent = 'Borrow Book';
+            buttonPinjam.textContent = 'Borrow Book';
+        } else {
+            bookStatus.textContent = `Will be available at: ${book[0].fields.return_date}`;
+            borrowButton.textContent = 'Return Book';
+            buttonPinjam.textContent = 'Borrowed';
+            buttonPinjam.disabled = true;
         }
     }
     refreshBook();
 
     function borrowBook(bookId) {
-        console.log("masuk fungsi borrowBook")
-        console.log(bookId)
         const book = getBooks();
         fetch(`{% url 'pinjam_buku:borrow_book_ajax' book.pk %}`, {
             method: "POST",
