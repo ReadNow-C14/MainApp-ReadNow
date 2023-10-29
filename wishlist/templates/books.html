@@ -10,6 +10,10 @@
     <a href="../">Back</a>
     <a href="wishlist/my-wishlist/"></a>
     <a href="/wishlist/my-wishlist/">My Wishlist</a>
+    <div class="search_bar">
+        <input type="text" id="search_bar" placeholder="Search book by isbn">
+        <button type="button" id="search_button" onclick="search_book()">Search</button>
+    </div>
     <div class="container">
         <div class="row row-cols-1 g-4" id="wishlist_body_card">
             <!-- diisi dengan refreshProducts -->
@@ -22,12 +26,47 @@
 
 
 
-
     
     <script>
+        // ======== Search Book ========
+        async function search_book(){
+            let isbn = document.getElementById("search_bar").value
+            const book = await getBookObject(isbn)
+            document.getElementById("wishlist_body_card").innerHTML = ""
+            htmlString = `
+                <div class="col-12 col-md-6 col-lg-3" id="card_book">
+                    <div class="card text-center">
+                        <div class="card-header">
+                            <h5 class="card-title">
+                                ${ book.title }
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <img src="${ book.image_url }" alt=""><br>
+                            <table>
+                                <tr>Pages</tr>
+                                <tr>: ${ book.num_of_pages }</tr>
+                            </table>
+                            <table>
+                                <tr>ISBN Number</tr>
+                                <tr>: ${ book.isbn }</tr>
+                            </table>
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn btn-primary" id="button_add" onclick="add_book(${ book.pk })">Add wishlist</button>
+                        </div>
+                    </div>
+                </div>
+            `
+            document.getElementById("wishlist_body_card").innerHTML = htmlString
+        }
+        async function getBookObject(isbn) {
+            return fetch("{% url 'wishlist:search_book' 0 %}".replace("0", isbn)).then((res) => res.json())
+        }
+
+
         // ======== Add Product ========
         function add_book(book_id){
-            console.log(book_id)
             const newURL = "{% url 'wishlist:add_book' 0 %}".replace("0", book_id);
             fetch(newURL, {
                 method: "POST",
@@ -36,20 +75,20 @@
                     "X-CSRFToken": "{{ csrf_token }}"
                 },
             }).then(
-                refreshMyWishlist()
+                refreshBooks()
             )
         }
 
 
         // ======== Refresh Product ========
-        async function getMyWishlist() {
+        async function getAllBooks() {
             return fetch("{% url 'wishlist:get_books_json' %}").then((res) => res.json())
         }
-        async function refreshMyWishlist() {
+        async function refreshBooks() {
             document.getElementById("wishlist_body_card").innerHTML = ""
-            const my_wishlist = await getMyWishlist()
+            const books = await getAllBooks()
             let htmlString = ``
-            my_wishlist.forEach((book) => {
+            books.forEach((book) => {
                 htmlString += `\n
                 <div class="col-12 col-md-6 col-lg-3" id="card_book">
                     <div class="card text-center">
@@ -78,6 +117,6 @@
             });
             document.getElementById("wishlist_body_card").innerHTML = htmlString
         }
-        refreshMyWishlist()
+        refreshBooks()
     </script>
 {% endblock content %}
