@@ -6,6 +6,7 @@ app_name = 'wishlist'
 urlpatterns = [
     # CRUD
     path('add-book/<int:book_id>/', add_book, name='add_book'),
+    path('remove-book/<int:book_id>/', remove_book, name='remove_book'),
     # wishlist
     path('get-wishlist/', get_wishlist_json, name='get_wishlist_json'),
     path('my-wishlist/', show_whishlist, name='show_whishlist'),

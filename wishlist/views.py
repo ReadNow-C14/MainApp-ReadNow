@@ -22,7 +22,12 @@ def get_wishlist_json(request):
     books = [wish.book for wish in wishlist]
     return HttpResponse(serializers.serialize("json",books),content_type="application/json")
 # ---------- Views for CRUD ----------
-
+def remove_book(request, book_id):
+    book = Book.objects.get(pk=book_id)
+    user = request.user
+    wishlist = Wishlist.objects.get(user=user, book=book)
+    wishlist.delete()
+    return HttpResponseRedirect('')
 
 
 # ========== Views for books ==========

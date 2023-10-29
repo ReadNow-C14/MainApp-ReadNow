@@ -13,10 +13,27 @@
     <div class="container">
         <div class="row row-cols-1 g-4" id="wishlist_body_card">
             <!-- diisi dengan refreshProducts -->
-            
         </div>
     </div>
     <script>
+        // ======== Remove Book ========
+        function remove_book(book_id){
+            console.log(book_id)
+            const newURL = "{% url 'wishlist:remove_book' 0 %}".replace("0", book_id);
+            fetch(newURL, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}"
+                },
+            }).then(
+                refreshMyWishlist()
+            )
+        }
+
+
+
+        // ======== Refresh Books ========
         async function getMyWishlist() {
             return fetch("{% url 'wishlist:get_wishlist_json' %}").then((res) => res.json())
         }
@@ -45,7 +62,7 @@
                             </table>
                         </div>
                         <div class="card-footer">
-                            <button type="button" class="btn btn-danger" id="button_remove" onclick="removeWishlistAjax(${book.pk})">Remove book from wishlist</button>
+                            <button type="button" class="btn btn-danger" id="button_remove" onclick="remove_book(${book.pk})">Remove book from wishlist</button>
                         </div>
                     </div>
                 </div>
