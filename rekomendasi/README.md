@@ -9,6 +9,7 @@
 ## Daftar Isi
 - [Tentang ReadNow](#tentang-modul-rekomendasi)
 - [To Do List](#to-do-list)
+- [Appendix](#appendix)
 
 
 ---
@@ -32,3 +33,6 @@ Aplikasi rekomendasi ini adalah sebuah platform yang dirancang untuk memberikan 
 - [x] Menerapkan filter informasi bagi pengguna yang sudah login saja. Contohnya adalah data alamat, umur, dan nomor ponsel hanya dapat dilihat oleh pengguna yang sudah login saja.
 
 - [x] Menerapkan filter pada dataset katalog buku yang ditampilkan. Contohnya adalah menampilkan daftar buku berdasarkan nama penulisnya.
+
+## Appendix
+- [Link Notebook Cleaning and Modelling Data](https://drive.google.com/file/d/1OHLU0tjRa2LLM9cA2g0e5S3KaepLzAHg/view?usp=sharing)
