@@ -71,7 +71,12 @@ def filter_books_ajax(request, id):
         )
 
     # NOTE: Masih perlu diatur tergantung kebutuhan pas di similar_book.html nantinya
-    data = [{'title': rec.recommended_book.title, 'authors': rec.recommended_book.authors, 'rating': rec.recommended_book.rating, 'image_url': rec.recommended_book.image_url} for rec in recommendation_books]
+    data = [{'id': rec.recommended_book.pk,
+            'title': rec.recommended_book.title,
+            'authors': rec.recommended_book.authors,
+            'rating': rec.recommended_book.rating, 
+            'image_url':rec.recommended_book.image_url}
+            for rec in recommendation_books]
 
     return JsonResponse(data, safe=False)
 

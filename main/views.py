@@ -11,6 +11,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.core import serializers
 from django.shortcuts import redirect
 from book.models import Book
+from pinjam_buku.views import *
 
 #@login_required(login_url='/login')
 def show_main(request):
@@ -67,6 +68,7 @@ def book_info(request, book_id):
         return render(request, 'not_found.html')
 
     context = {
+        'name': request.user.username,
         'book': book,
     }
     return render(request, 'book_info.html', context)
