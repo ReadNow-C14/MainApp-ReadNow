@@ -4,6 +4,9 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.db.models import Q
+from django.db.models import F
+from django.http import request
 from django.contrib import messages  
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -14,8 +17,23 @@ from book.models import Book
 from pinjam_buku.views import *
 
 #@login_required(login_url='/login')
+from django.db.models import Q
+
 def show_main(request):
-    books = Book.objects.all()  # Retrieve all books from the database
+    books = Book.objects.all()
+    
+    search_query = request.GET.get('search', '')
+    sort_option = request.GET.get('sort', 'title')
+
+    if sort_option == 'rating':
+        books = books.order_by('-rating')
+    elif sort_option == 'pages':
+        books = books.order_by('num_of_pages')
+    else:
+        books = books.order_by('title')
+
+    if search_query:
+        books = books.filter(title__icontains=search_query)
 
     rows = math.ceil(len(books) / 3)
     bookdata = []
@@ -27,9 +45,11 @@ def show_main(request):
         'name': request.user.username,
         'app': 'ReadNow',
         'bookdata': bookdata,
+        'search_query': search_query,
+        'sort_option': sort_option, 
     }
-
     return render(request, 'main.html', context)
+
 
 def register(request):
     form = UserCreationForm()

@@ -2,24 +2,26 @@
 
 {% block content %}
 
-    <div class="text-center mt-4">
-        <h2 class="font-bold text-2xl">List of Books</h2>
-    </div>
-
-    <!-- Search bar and sort options -->
-    <div class="flex justify-center items-center mt-4">
-        <div class="flex">
-            <input type="text" placeholder="Search..." class="rounded-l-md p-2 border border-gray-300 focus:ring-2 focus:ring-blue-500">
-            <button class="bg-blue-500 text-white rounded-r-md p-2">Search</button>
-        </div>
-        <div class="ml-4">
-            <label for="sort" class="text-gray-600">Sort by:</label>
-            <select id="sort" name="sort" class="rounded-md p-2 border border-gray-300 focus:ring-2 focus:ring-blue-500">
-                <option value="title">Alphabetic</option>
-                <option value="rating">Rating</option>
-                <option value="pages">Number of Pages</option>
-            </select>
-        </div>
+    <div class="container mt-4">
+        <form method="get" action="{% url 'main:show_main' %}" class="row g-3">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <input type="text" name="search" class="form-control" placeholder="Search..." value="{{ search_query }}">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="input-group">
+                    <label for="sort" class="col-form-label text-secondary">Sort by:</label>
+                    <select id="sort" name="sort" class="form-select">
+                        <option value="title" {% if sort_option == 'title' %}selected{% endif %}>Alphabetic</option>
+                        <option value="rating" {% if sort_option == 'rating' %}selected{% endif %}>Rating</option>
+                        <option value="pages" {% if sort_option == 'pages' %}selected{% endif %}>Number of Pages</option>
+                    </select>
+                    <button type="submit" class="btn btn-primary">Apply</button>
+                </div>
+            </div>
+        </form>
     </div>
 
     <div class="flex justify-center">
