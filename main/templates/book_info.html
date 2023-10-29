@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div>
+    <a href="javascript:history.go(-1);" class="btn btn-link text-dark ml-6">Back</a>
+    </div>  
+    <div class="container mx-auto text-center mt-8">  
+        <h1 class="text-2xl font-bold mb-4">{{ book.title }}</h1>
+        <div class="flex justify-center">
+            <img src="{{ book.image_url }}" alt="{{ book.title }} Cover" class="book-image mb-4">
+        </div>
+        <p class="mb-2">Author: {{ book.authors }}</p>
+        <p class="mb-2">Number of Pages: {{ book.num_of_pages }}</p>
+        <p class="mb-2">ISBN: {{ book.isbn }}</p>
+        <p class="mb-2">Publisher: {{ book.publisher }}</p>
+        <p class="mb-2">Rating: {{ book.rating }}</p>
+        <p id="status_buku" class="mb-4">Status: {{ book.status }}</p>
+
+        <div class="flex justify-center">
+            <a href="{% url 'rekomendasi:similar_books' book.pk %}">
+                <button class="btn btn-dark mx-4 mb-4 rounded">Recommendation</button>
+            </a>
+            <a href="{% url 'reviews_for_book' book.pk %}">
+                <button class="btn btn-dark mx-4 mb-4 rounded">Book Review</button>
+            </a>
+        </div>
+    </div>
+
+    {% if user.is_authenticated %}
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Borrow a Book</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="form" onsubmit="return false;">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="returnDate">Set Return Date</label>
+                            <input type="date" class="form-control" id="returnDate" name="return_date">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn btn-dark mx-2 rounded" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn btn-dark mx-4 rounded" id="button_borrow" data-bs-dismiss="modal" data-book-id="{{ book.pk }}">Borrow This Book</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="flex justify-center">
+        <button type="button" class="btn btn-dark mx-4 rounded" data-bs-toggle="modal" data-bs-target="#exampleModal" id="button_pinjam">Borrow This Book</button>
+    </div>
+    {% endif %}
+</body>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    async function getBooks() {
+        const bookId = document.querySelector('#button_borrow').getAttribute('data-book-id');
+        return fetch(`/json/${bookId}`).then((res) => res.json())
+    }
+
+    async function refreshBook() {
+        const book = await getBooks();
+        console.log(book[0].fields.status)
+
+        const bookStatus = document.getElementById("status_buku");
+        const buttonPinjam = document.getElementById('button_pinjam');
+        const borrowButton = document.getElementById('button_borrow');
+
+        if (book[0].fields.status === 'Available') {
+            bookStatus.textContent = 'Status: Available';
+            borrowButton.textContent = 'Borrow Book';
+            buttonPinjam.textContent = 'Borrow Book';
+        } else {
+            bookStatus.textContent = `Will be available at: ${book[0].fields.return_date}`;
+            borrowButton.textContent = 'Return Book';
+            buttonPinjam.textContent = 'Borrowed';
+            buttonPinjam.disabled = true;
+        }
+    }
+    refreshBook();
+
+    function borrowBook(bookId) {
+        const book = getBooks();
+        fetch(`{% url 'pinjam_buku:borrow_book_ajax' book.pk %}`, {
+            method: "POST",
+            body: new FormData(document.querySelector('#form'))
+        }).then(refreshBook)
+
+        document.getElementById("form").reset()
+        return false
+    }
+
+    document.getElementById("button_borrow").onclick = function() {  
+        const bookId = document.querySelector('#button_borrow').getAttribute('data-book-id'); 
+        borrowBook(bookId);
+    }
+
+
+
+</script>
+
+{% endblock content %}

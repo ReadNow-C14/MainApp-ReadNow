@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block meta %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha384-KyZXEAg3QhqLMpG8r+J4jsl5c9zdLKaUk5Ae5f5b1bw6AUn5f5v8FZJoMxm6f5cH1" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
+{% endblock meta %}
+{% block content %}
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="">Add Books to Your Wishlist!</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/wishlist/my-wishlist/">My Wishlist</a>
+                    </li>
+                </ul>
+                <form class="d-flex" role="search">
+                    <input class="form-control me-2" type="search" id="search_bar" placeholder="Search book by isbn" aria-label="Search">
+                    <button class="btn btn-outline-success" type="submit" onclick="search_book()">Search</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+    <br>
+
+
+    
+    <div class="container">
+        <div class="row row-cols-1 g-4" id="wishlist_body_card">
+            <!-- diisi dengan refreshProducts -->
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    <script>
+        // ======== Search Book ========
+        async function search_book(){
+            let isbn = document.getElementById("search_bar").value
+            const book = await getBookObject(isbn)
+            document.getElementById("wishlist_body_card").innerHTML = ""
+            htmlString = `
+                <div class="col-12 col-md-6 col-lg-3" id="card_book">
+                    <div class="card text-center">
+                        <div class="card-header">
+                            <h5 class="card-title">
+                                ${ book.title }
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <img src="${ book.image_url }" alt=""><br>
+                            <table>
+                                <tr>Pages</tr>
+                                <tr>: ${ book.num_of_pages }</tr>
+                            </table>
+                            <table>
+                                <tr>ISBN Number</tr>
+                                <tr>: ${ book.isbn }</tr>
+                            </table>
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn btn-primary" id="button_add" onclick="add_book(${ book.pk })">Add wishlist</button>
+                        </div>
+                    </div>
+                </div>
+            `
+            document.getElementById("wishlist_body_card").innerHTML = htmlString
+        }
+        async function getBookObject(isbn) {
+            return fetch("{% url 'wishlist:search_book' 0 %}".replace("0", isbn)).then((res) => res.json())
+        }
+
+
+        // ======== Add Product ========
+        function add_book(book_id){
+            const newURL = "{% url 'wishlist:add_book' 0 %}".replace("0", book_id);
+            fetch(newURL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}"
+                },
+            }).then(
+                refreshBooks()
+            )
+        }
+
+
+        // ======== Refresh Product ========
+        async function getAllBooks() {
+            return fetch("{% url 'wishlist:get_books_json' %}").then((res) => res.json())
+        }
+        async function refreshBooks() {
+            document.getElementById("wishlist_body_card").innerHTML = ""
+            const books = await getAllBooks()
+            let htmlString = ``
+            books.forEach((book) => {
+                htmlString += `\n
+                <div class="col-12 col-md-6 col-lg-3" id="card_book">
+                    <div class="card text-center">
+                        <div class="card-header">
+                            <h5 class="card-title">
+                                ${ book.fields.title }
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <img src="${ book.fields.image_url }" alt=""><br>
+                            <table>
+                                <tr>Pages</tr>
+                                <tr>: ${ book.fields.num_of_pages }</tr>
+                            </table>
+                            <table>
+                                <tr>ISBN Number</tr>
+                                <tr>: ${ book.fields.isbn }</tr>
+                            </table>
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn btn-primary" id="button_add" onclick="add_book(${book.pk})">Add wishlist</button>
+                        </div>
+                    </div>
+                </div>
+                `
+            });
+            document.getElementById("wishlist_body_card").innerHTML = htmlString
+        }
+        refreshBooks()
+    </script>
+{% endblock content %}

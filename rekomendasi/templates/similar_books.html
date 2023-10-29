@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+    <!-- Font Montserrat -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap" rel="stylesheet">
+
+    <!-- External Stylesheet -->
+    <link rel="stylesheet" type="text/css" href=" {% static 'admin/css/styles.css' %} ">
+
+    <!-- Bootstrap -->
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha384-KyZXEAg3QhqLMpG8r+J4jsl5c9zdLKaUk5Ae5f5b1bw6AUn5f5v8FZJoMxm6f5cH1" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script> -->
+
+    <!-- Content -->
+    <div class="background-purple" style="padding-bottom: 80px;">
+        <nav class="navbar navbar-expand-lg">
+            <div class="container mt-3">
+                <a class="navbar-brand d-flex align-items-center justify-content-center" style="color:white; font-family: 'Montserrat', sans-serif;">
+                    <img src="{% static 'icon-recommendation.png' %}" alt="Logo" width="50" height="40" class="d-inline-block align-text-top me-1 book-image">
+                    Book Recommendation</a>
+
+                <!-- Filter with AJAX -->
+                <form id="filterForm" class="d-flex" role="search" method="get" onsubmit="return false">
+                    <label class = "nav-item" for="publishYear"></label>
+                    <input class="form-control me-2" placeholder="Masukkan tahun terbit" aria-label="Tahun Terbit" type="number" name="publishYear" id="publishYear" min="0" step="1">
+                    <input type="button" value="Filter" class="btn btn-primary mx-1" onclick="getFilteredBooks()">
+                    <a href="{% url 'rekomendasi:similar_books' main_book.id %}" class="btn btn-warning mx-1">Reset</a>
+                </form>
+            </div>
+        </nav>
+
+        <section class="hero" stye="padding:80px 0;">
+            <div class="container">
+                <div class="row">
+                    <div class="row d-flex align-items-center justify-content-center">
+                        <div class ="col-md-6">
+                            <div class="text" style="font-family: 'Montserrat', sans-serif; font-size:40px; line-height: 50px; margin-top:30px">
+                                Book Recommendations Based on<br> <p style="font-size: 20px; line-height: 30px; margin-top: 20px;">{{ main_book.title }}</p>
+                            </div>
+                            <div class="buttons" style="padding-top:40px">
+                                <a href="#bookRec" class="btn btn-dark" style="font-weight: bold;">See Recommendations</a>
+                                <button type="button" class="btn btn-warning ms-3" data-bs-toggle="modal" data-bs-target="#exampleModal" style="font-weight: bold;">Other Book Recommendations</button>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <img class="icon-book-3d" src="{% static '4.png' %}" alt="book-icon" width="450" height="350" style="margin-left:80px;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Modal Ganti Rekomendasi Buku -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Other Book Recommendations</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="form" onsubmit="return false;">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="name" class="col-form-label">ISBN:</label>
+                            <input type="text" class="form-control" id="isbn" name="isbn"></input>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="button_submit" data-bs-dismiss="modal">Find Recommendations</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mt-5 mb-5" id="book_list">
+        <div class="book-grid">
+            {% for recommendation in recommendation_books %}
+                <div class="card" style="width: 120px;">
+                    <img src="{{ recommendation.recommended_book.image_url }}" class="card-img-top" alt="{{ recommendation.recommended_book.title }}" height="180px" style="object-fit: cover;">
+                    <div class="card-body">
+                        <h5 class="card-title" style="font-size: 12px;">{{ recommendation.recommended_book.title }}</h5>
+                        <p class="card-text" style="font-size: 10px;">{{ recommendation.recommended_book.authors }}</p>
+                        <a href="{% url 'main:book_info' main_book.id %}" class="btn btn-primary" id="purple-button" style="font-size: 8px; padding: 5px 10px; ">More Informations</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="container mt-5 mb-5" id="book_list_wishlist">
+        {% if user.is_authenticated %}
+            <!-- Konten yang hanya ditampilkan untuk pengguna yang sudah login -->
+            <h4 style="text-align: center; margin-bottom: 40px;" >Recommendations Based on Your Wishlist</h2>
+            <div class="book-grid">
+                {% for recommendation in recommendation_wishlist %}
+                    <div class="card" style="width: 120px;">
+                        <img src="{{ recommendation.recommended_book.image_url }}" class="card-img-top" alt="{{ recommendation.recommended_book.title }}" height="180px" style="object-fit: cover;">
+                        <div class="card-body">
+                            <h5 class="card-title" style="font-size: 12px;">{{ recommendation.recommended_book.title }}</h5>
+                            <p class="card-text" style="font-size: 10px;">{{ recommendation.recommended_book.authors }}</p>
+                            <a href="{% url 'main:book_info' main_book.id %}" class="btn btn-primary" id="purple-button" style="font-size: 8px; padding: 5px 10px; ">More Informations</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+        {% else %}
+            <!-- Konten yang hanya ditampilkan untuk pengguna yang belum login -->
+            <p style="text-align: center;">Please <a href="{% url 'main:login' %}">login</a> to see recommendations based on your wishlist.</p>
+        {% endif %}
+    </div>
+
+    
+
+    <script>
+        async function getFilteredBooks() {
+            const selectedYear = document.getElementById('publishYear').value;
+            const url = `{% url 'rekomendasi:filter_books_ajax' main_book.id %}?publishYear=${selectedYear}`;
+            
+            const response = await fetch(url);
+            if (response.ok) {
+                document.getElementById("book_list").innerHTML = ""
+                const books = await response.json();
+
+                let htmlString = `<div class="container mt-5" id="book_list">
+                    <div class="book-grid">`
+                    books.forEach((book) => {
+                        htmlString += `\n<div class="card" style="width: 120px;">
+                                        <img src="${book.image_url}" class="card-img-top" alt="${book.title}" height="180px" style="object-fit: cover;">
+                                        <div class="card-body">
+                                            <h5 class="card-title" style="font-size: 12px;">${book.title}</h5>
+                                            <p class="card-text" style="font-size: 10px;">${book.authors}</p>
+                                            <a href="#" class="btn btn-primary" id="purple-button" style="font-size: 8px; padding: 5px 10px; ">More Informations</a>
+                                        </div>
+                                    </div>
+                            </div>
+                        </div>`
+                    })
+                    
+                    document.getElementById("book_list").innerHTML = htmlString
+            } else {
+                alert('Failed to fetch filtered books.');
+            }
+        }
+
+        // Find ISBM Form -> Melakukan redirect ke halaman rekomendasi buku yang diinginkan
+        function findIsbn() {
+            fetch("{% url 'rekomendasi:isbn_search' %}", {
+                method: "POST",
+                body: new FormData(document.querySelector('#form'))
+            }).then(response => {
+                if (response.ok) {
+                    return response.json(); // Parse the JSON response
+                } else {
+                    // Handle error response
+                    document.getElementById("form").reset(); // Reset the form
+                    alert('ISBN not found or an error occurred.');
+                }
+            }).then(data => {
+                if (data.redirect_url) {
+                    // Redirect to the specified URL
+                    window.location.href = data.redirect_url;
+                }
+            });
+            return false;
+        }
+
+        document.getElementById("button_submit").onclick = findIsbn;
+
+    </script>
+
+{% endblock content %}
