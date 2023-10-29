@@ -9,7 +9,7 @@
 .book-grid {
     display: grid;
     grid-template-columns: repeat(6, 1fr); 
-    gap: 25px; 
+    gap: 20px; 
 }
 
 .card-title {
