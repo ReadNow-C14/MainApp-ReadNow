@@ -52,9 +52,10 @@ def borrow_book_ajax(request, id):
 
 @csrf_exempt
 def return_book_ajax(request, id):
-    borrowed_book = BorrowedBook.objects.get(pk=id)
-    borrowed_book.delete()
-    book = Book.objects.get(id=id)
-    book.status = "Available"
-    book.save()
+    borrowed_book = BorrowedBook.objects.filter(user=request.user)
+    for book in borrowed_book:
+        if book.book.id == id:
+            book.book.status = "Available"
+            book.book.save()
+            book.delete()
     return HttpResponse(b"RETURNED", status=201)
