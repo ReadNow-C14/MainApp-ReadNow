@@ -12,4 +12,7 @@
     <a href="{% url 'rekomendasi:similar_books' book.pk %}">
         <button class="bg-blue-500 text-white py-2 px-4 rounded-md">Rekomendasi</button> 
     </a>
+    <a href="{% url 'wishlist:add_wish' book.pk %}">
+        <button>Add to my Wishlist</button>
+    </a>
 {% endblock content %}
