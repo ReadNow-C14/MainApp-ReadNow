@@ -42,7 +42,6 @@ def submit_review(request, book_id):
             review.save()
             return redirect(url)
         else:
-
             return redirect(url)
         
 @login_required(login_url='/login/')
@@ -61,7 +60,7 @@ def submit_review_ajax(request, book_id):
             review.user = request.user
             review.book_id = book_id
             review.save()
-            messages.success(request, 'Thank you! Your review has been submitted.')
+            
             return HttpResponse(b"CREATED", status=201)
         else:
             messages.error(request, 'There was an error with your submission.')

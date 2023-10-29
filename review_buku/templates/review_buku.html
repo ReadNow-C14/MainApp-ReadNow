@@ -8,10 +8,7 @@
 
         <header class="section-heading">
             <h3 class="text-center">{{ book.title }}'s reviews</h3>
-        </header>
-
-        <div id="review_list"></div>
-        <hr>
+        </header>        
 
         <section class="mt-5">
             <h4 class="text-center mb-4">Wanna give your review?</h4>
@@ -33,14 +30,19 @@
                 
                 
                 <div class="mb-4 flex justify-center">
-                    <textarea name="comment" class="w-1/2 h-32 resize-none border rounded p-2"></textarea>
+                    <textarea name="comment" class="w-1/2 h-32 resize-none border rounded p-2" placeholder="Give your review here..."></textarea>
                 </div>
 
                 <div class="d-flex justify-content-center">
-                    <input type="button" value="Submit Review Ajax" class="btn btn-secondary" id="button_add" onclick="addReview()">
+                    <input type="button" value="Submit" class="btn btn-primary" id="button_add" onclick="addReview()">
                 </div>
             </form>
         </section>
+        
+        <hr>
+        <br>
+
+        <div id="review_list"></div>
 
     </div>
 </section>
@@ -49,34 +51,53 @@
     async function getReviews() {
         return fetch("{% url 'get_review_json' book.id %}").then((res) => res.json())
     }
+    
 
     async function refreshReviews() {
         document.getElementById("review_list").innerHTML = "";
         const reviews = await getReviews();
         let htmlString = ``;
         
-        reviews.forEach((review) => {
-            htmlString += `
-            <div class="card mb-3">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h6 class="card-title d-inline">${review.user}</h6>
-                            <span class="rating-star ml-2">
-                                ${Array(parseInt(review.rating)).fill().map(()=>`⭐`).join('')}
-                            </span>
+        if (reviews.length === 0) {
+            htmlString = `<h3 class="text-center">No Review yet</h3>`;
+        } else {
+            htmlString = `<h4 class="text-center">${reviews.length} review(s)</h4>`;
+            
+            // Start the row outside of the loop
+            htmlString += `<div class="row">`;
+            
+            reviews.forEach((review, index) => {
+                htmlString += `
+                <div class="col-md-4">
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="card-title d-inline">${review.user}</h6>
+                                    <span class="rating-star ml-2">
+                                        ${Array(parseInt(review.rating)).fill().map(() => `⭐`).join('')}
+                                    </span>
+                                </div>
+                                <span class="text-muted">${review.created_at}</span>
+                            </div>
+                            <p class="card-text mt-2">${review.comment}</p>
                         </div>
-                        <span class="text-muted">${review.created_at}</span>
                     </div>
-                    <p class="card-text mt-2">${review.comment}</p>
-                </div>
-            </div>
-            `;
-        });
+                </div>`;
+                
+                // Close the current row and start a new one after every 3rd review
+                if ((index + 1) % 3 === 0 && index !== reviews.length - 1) {
+                    htmlString += `</div><div class="row">`;
+                }
+            });
+        
+            // Close the last row after loop finishes
+            htmlString += `</div>`;
+        }
+        
         
         document.getElementById("review_list").innerHTML = htmlString;
     }
-       
 
     function addReview() {
         fetch("{% url 'submit_review_ajax' book.id %}", {
