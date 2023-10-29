@@ -3,7 +3,7 @@
 
 ---
 ## Link Deployment
-http://readnow-c14-tk.pbp.cs.ui.ac.id
+https://ristek.link/ReadNow-C14
 
 ## Anggota Kelompok
 - Harjuno Abdullah (2206814053)
