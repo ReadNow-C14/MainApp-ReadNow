@@ -8,72 +8,73 @@
 {% endblock meta %}
 {% block content %}
     <h1>This is my wish list</h1>
-    <a href="/wishlist/utama/">List Semua Buku</a>
+    <a href="../">Back</a>
     <a href="/wishlist/get-wishlist">JSON</a>
     <div class="container">
         <div class="row row-cols-1 g-4" id="wishlist_body_card">
             <!-- diisi dengan refreshProducts -->
-            {% for wish in my_wishlist %}
+            
+        </div>
+    </div>
+    <script>
+        async function getMyWishlist() {
+            return fetch("{% url 'wishlist:get_wishlist_json' %}").then((res) => res.json())
+        }
+        async function refreshMyWishlist() {
+            document.getElementById("wishlist_body_card").innerHTML = ""
+            const my_wishlist = await getMyWishlist()
+            let htmlString = ``
+            my_wishlist.forEach((book) => {
+                htmlString += `\n
                 <div class="col-12 col-md-6 col-lg-3" id="card_book">
                     <div class="card text-center">
                         <div class="card-header">
                             <h5 class="card-title">
-                                {{ wish.book.title }}
+                                ${ book.fields.title }
                             </h5>
                         </div>
                         <div class="card-body">
-                            <img src="{{ wish.book.image_url }}" alt=""><br>
+                            <img src="${ book.fields.image_url }" alt=""><br>
                             <table>
                                 <tr>Pages</tr>
-                                <tr>: {{ wish.book.num_of_pages }}</tr>
+                                <tr>: ${ book.fields.num_of_pages }</tr>
                             </table>
                             <table>
                                 <tr>ISBN Number</tr>
-                                <tr>: {{ wish.book.isbn }}</tr>
+                                <tr>: ${ book.fields.isbn }</tr>
                             </table>
                         </div>
                         <div class="card-footer">
-                            <!-- TODO: Bikin conditional, kalo udah ada di wishlist -->
-                            <a href="{% url 'wishlist:delete_wish' wish.book.id %}" class="btn btn-danger">Remove from wishlist</a>
+                            <button type="button" class="btn btn-danger" id="button_remove" data-bookid="${book.pk} onclick="removeListener(this)">Remove book from wishlist</button>
                         </div>
                     </div>
-                </div>
-            {% endfor %}
-        </div>
-    </div>
-    <!-- <script>
-        async function getMyWishlist() {
-            return fetch("{% url 'wishlist:get_wishlist_json' %}")
-                .then((response) => response.json())
-        }
-        async function refreshMyWishlist() {
-            document.getElementById("wishlist_body_card").innerHTML = ""
-            const books = await getMyWishlist()
-            let htmlString = `Ini Harusnya ada buku di wishlist<br>`
-            my_wishlist.array.forEach(wish => {
-                htmlString += `\n
-                <div class="col-12 col-md-6 col-lg-3" id="card_product">
-                <div class="card text-center">
-                    <div class="card-header">
-                        <h5 class="card-title">
-                            ${wish.fields.book.title}
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <p class="card-text">
-                            ${wish.fields.book.num_of_pages}
-                        </p>
-                        <p class="card-text">
-                            Rp${wish.fields.book.isbn}
-                        </p>
-                    </div>
-                </div>
                 </div>
                 `
             });
             document.getElementById("wishlist_body_card").innerHTML = htmlString
+        }        
+        // remove wishlist
+        function removeWishlistAjax(bookId) {
+            fetch(`/wishlist/delete-wish-ajax/${bookId}/`, {
+                method: "DELTE",
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}"
+                }
+            })
+            .then((res) => {
+                if (res.status === 200) {
+                    // Item berhasil dihapus, refresh wishlist
+                    refreshMyWishlist();
+                }
+            })
+            .catch((error) => {
+                console.error(error);
+            });
         }
-
+        function removeListener(button) {
+            const bookId = button.getAttribute("data-bookid");
+            removeWishlistAjax(bookId);
+        }
         refreshMyWishlist()
-    </script> -->
+    </script>
 {% endblock content %}

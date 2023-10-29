@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from book.models import Book
 from .models import Wishlist
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, HttpResponseNotFound
 from django.core import serializers
 
 # Create your views here.
@@ -15,9 +15,10 @@ def show_whishlist(request):
 
 def get_wishlist_json(request):
     # TODO: buat filter berdasarkan user, karena saat ini ambil semua objek buku
-    # Mengambil semua object buku
+    # Mengambil semua object wishlist
     wishlist = Wishlist.objects.all()
-    return HttpResponse(serializers.serialize("json",wishlist),content_type="application/json")
+    books = [wish.book for wish in wishlist]
+    return HttpResponse(serializers.serialize("json",books),content_type="application/json")
 
 def add_wish(request, id):
     # Menambahkan buku ke wishlist
@@ -29,19 +30,35 @@ def add_wish(request, id):
     else:
         # jika belum ada, maka tambahkan
         Wishlist.objects.create(user=request.user, book=book)
-    return HttpResponseRedirect('/wishlist/')
+    return HttpResponseRedirect('/')
 
 def delete_wish(request, id):
     # Menghapus buku dari wishlist
     book = Book.objects.get(pk=id)
     Wishlist.objects.get(user=request.user, book=book).delete()
-    return HttpResponseRedirect('/wishlist/')
+    return HttpResponseRedirect('/')
 
+def add_wish_ajax(request):
+    if request.method == 'POST':
+        book = request.post.get('book')
+        user = request.user
+        new_wish = Wishlist(user=user, book=book)
+        new_wish.save()
+        return JsonResponse({'message': 'Item added to wishlist'}, status=201)
+    return HttpResponseNotFound()
 
-def show_books(request):
-    # Menampilkan semua buku
+def delete_wish_ajax(request, id):
+    try:
+        # ambil objek wishlist yang akan dihapus
+        book = Book.objects.get(pk=id)
+        wishlist = Wishlist.objects.get(user=request.user, book=book)
+        # hapus wishlist
+        wishlist.delete()
+        return HttpResponseRedirect('/wishlist/')
+    except Wishlist.DoesNotExist:
+        return JsonResponse({'message': 'Item does not exist in wishlist'}, status=404)
+
+def get_books_json(request):
+    # Mengambil semua object buku
     books = Book.objects.all()
-    context = {
-        'books': books
-    }
-    return render(request, 'utama.html', context)
+    return HttpResponse(serializers.serialize("json",books),content_type="application/json")
