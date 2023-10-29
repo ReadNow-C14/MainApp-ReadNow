@@ -1,13 +1,13 @@
 from django.shortcuts import render
 from book.models import Book
 from .models import Wishlist
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.core import serializers
 
 # Create your views here.
 def show_whishlist(request):
     # Menampilkan wishlist
-    wishlists = Wishlist.objects.filter(user=request.user)
+    wishlists = Wishlist.objects.all()
     context = {
         'my_wishlist': wishlists
     }
@@ -22,14 +22,20 @@ def get_wishlist_json(request):
 def add_wish(request, id):
     # Menambahkan buku ke wishlist
     book = Book.objects.get(pk=id)
-    Wishlist.objects.create(user=request.user, book=book)
-    return render(request, 'wishlist.html')
+    # cek apakah buku sudah ada di wishlist
+    if Wishlist.objects.filter(user=request.user, book=book).exists():
+        # jika sudah ada, maka tidak perlu ditambahkan lagi
+        pass
+    else:
+        # jika belum ada, maka tambahkan
+        Wishlist.objects.create(user=request.user, book=book)
+    return HttpResponseRedirect('/wishlist/')
 
 def delete_wish(request, id):
     # Menghapus buku dari wishlist
     book = Book.objects.get(pk=id)
     Wishlist.objects.get(user=request.user, book=book).delete()
-    return render(request, 'wishlist.html')
+    return HttpResponseRedirect('/wishlist/')
 
 
 def show_books(request):
