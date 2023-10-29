@@ -2,6 +2,8 @@
 <p align="center">Proyek berbasis Django untuk tugas kelompok tengah semester mata kuliah Pemrograman Berbasis Platform Ganjil 2023/2024.</p>
 
 ---
+## Link Deployment
+http://readnow-c14-tk.pbp.cs.ui.ac.id
 
 ## Anggota Kelompok
 - Harjuno Abdullah (2206814053)
