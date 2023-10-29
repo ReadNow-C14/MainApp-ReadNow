@@ -8,6 +8,7 @@
 {% block content %}
     <h1>This is books.html</h1>
     <a href="../">Back</a>
+    <a href="/wishlist/my-wishlist/">My Wishlist</a>
     <div class="container">
         <div class="row row-cols-1 g-4" id="wishlist_body_card">
             <!-- diisi dengan refreshProducts -->
@@ -26,8 +27,13 @@
         // ======== Add Product ========
         function add_book(book_id){
             console.log(book_id)
-            fetch('/add-book/${book_id}', {
+            const newURL = "{% url 'wishlist:add_book' 0 %}".replace("0", book_id);
+            fetch(newURL, {
                 method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}"
+                },
             }).then(
                 refreshMyWishlist()
             )

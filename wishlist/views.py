@@ -42,6 +42,9 @@ def get_books_json(request):
 def add_book(request, book_id):
     book = Book.objects.get(pk=book_id)
     user = request.user
+    # cek apakah buku sudah ada di wishlist
+    if Wishlist.objects.filter(user=user, book=book).exists():
+        return HttpResponseRedirect('')
     wishlist = Wishlist(user=user, book=book)
     wishlist.save()
-    return HttpResponseRedirect('/book/')
+    return HttpResponseRedirect('')
