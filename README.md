@@ -19,7 +19,6 @@
   - [Modul Rekomendasi Buku](#modul-rekomendasi-buku)
   - [Modul Review Buku dan Forum](#modul-review-buku-dan-forum)
   - [Modul Pinjam Buku](#modul-pinjam-buku)
-  - [Modul Request Buku](#modul-request-buku)
 - [Sumber Dataset Katalog Buku](#sumber-dataset-katalog-buku)
 - [Role User](#role-user)
   - [Pengguna Tidak Log In](#pengguna-tidak-log-in)
@@ -37,7 +36,7 @@ Tingkat literasi di Indonesia menjadi tantangan serius yang perlu diatasi. Berda
 ## Manfaat ReadNow
 1. Pengguna dapat dengan mudah mencari, mengakses, dan membaca berbagai buku dari berbagai genre dan topik, tanpa harus pergi ke perpustakaan fisik.
 2. Membantu meningkatkan tingkat literasi, terutama literasi digital, dengan menyediakan akses ke sumber bacaan yang beragam.
-3. Membantu menemukan buku-buku baru yang sesuai dengan minat atau riwayat baca dari pengguna.
+3. Membantu menemukan buku-buku baru yang sesuai dengan minat dari pengguna.
 4. Pengguna dapat dengan mudah berbagi buku atau rekomendasi dengan teman-teman mereka melalui forum.
 
 ---
@@ -65,12 +64,6 @@ Modul ini memungkinkan pengguna untuk menulis dan membagikan ulasan buku, serta 
 Modul ini memungkinkan pengguna untuk meminjam buku dari daftar buku yang tersedia. Fitur-fitur utama dari modul ini akan meliputi:
 - Meminjam buku-buku yang tersedia
 - Mengembalikan buku yang dipinjam
-- Melihat riwayat peminjaman buku
-
-### 📥 Modul Request Buku 📥
-Modul ini memungkinkan pengguna untuk mengajukan permintaan untuk buku-buku yang tidak ada dalam daftar buku yang tersedia. Fitur-fitur utama dari modul ini akan meliputi:
-- Mengajukan permintaan untuk buku tertentu
-- Melihat status permintaan buku
 
 ---
 
@@ -96,11 +89,8 @@ Pengguna yang masuk ke dalam sistem memiliki akses lebih banyak fitur dan fungsi
 - `Menambahkan Buku ke Wishlist`: Pengguna dapat menambahkan buku ke dalam wishlist mereka.
 - `Menulis Ulasan atau Forum Buku`: Pengguna dapat menulis ulasan dan memberikan peringkat pada buku serta berdiskusi mengenai buku dengan pengguna lain.
 - `Melakukan Peminjaman Buku:` Pengguna dapat meminjam buku dari daftar buku yang tersedia.
-- `Melihat Riwayat Peminjaman`: Pengguna dapat melihat riwayat peminjaman buku mereka.
-- `Mengajukan Permintaan Buku`: Pengguna dapat mengajukan permintaan untuk buku-buku yang tidak tersedia dalam daftar buku yang tersedia.
 - `Melihat Rekomendasi Personal`: Pengguna dapat melihat rekomendasi buku yang disesuaikan berdasarkan preferensi mereka dan buku-buku yang telah mereka favoritkan.
 
 ### 👮‍♂️ Admin 👮‍♂️
 Admin adalah pengguna khusus dengan hak istimewa tertentu. Admin memiliki akses ke semua aspek proyek dan dapat melakukan tugas administratif, seperti:
 - `Mengelola Buku`: Admin dapat menambahkan, mengedit, dan menghapus buku dari sistem.
-- `Menangani Permintaan Buku`: Admin dapat menyetujui atau menolak permintaan buku dari pengguna.
