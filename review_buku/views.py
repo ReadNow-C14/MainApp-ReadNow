@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseNotFound
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from book.models import Book
@@ -8,6 +8,7 @@ from django.core import serializers
 from django.shortcuts import redirect, render
 from django.contrib import messages
 import datetime
+from django.http import JsonResponse
 
 def reviews_for_book(request, book_id):
     book = Book.objects.get(id=book_id)
@@ -15,28 +16,21 @@ def reviews_for_book(request, book_id):
     form = ReviewForm()
     return render(request, 'review_buku.html', {'reviews': reviews, 'book': book, 'form': form})
 
-def review_json(request, product_id):
-    data = Review.objects.all()
+def review_json(request, book_id):
+    book = Book.objects.get(id=book_id)
+    data = Review.objects.filter(book=book)
     return HttpResponse(serializers.serialize('json', data))
 
 @login_required(login_url='/login/')
 @csrf_exempt
-def submit_review(request, book_id):
-    url = request.META.get('HTTP_REFERER')
+def submit_review(request):
     if request.method == 'POST':
-        try:
-            reviews = Review.objects.get(user__id=request.user.id, book__id=book_id)
-            form = ReviewForm(request.POST, instance=reviews)
-        except Review.DoesNotExist:
-            form = ReviewForm(request.POST)
+        book = request.POST.get('book')
+        user = request.user
+        comment = request.POST.get('comment')
+        new_rev = Review(user=user, book=book, comment=comment)
+        new_rev.save()
+        return JsonResponse({'message': 'Review Added!'}, status=201)
+    return HttpResponseNotFound()
+    
 
-        if form.is_valid():
-            review = form.save(commit=False)
-            review.user = request.user
-            review.book_id = book_id
-            review.save()
-            messages.success(request, 'Thank you! Your review has been submitted.')
-            return redirect(url)
-        else:
-            messages.error(request, 'There was an error with your submission.')
-            return redirect(url)

@@ -38,6 +38,9 @@
                                     <a href="{% url 'main:book_info' book.id %}">
                                         <button class="bg-blue-500 text-white py-2 px-4 rounded-md">Book Information</button>
                                     </a>
+                                    <a href="{% url 'wishlist:add_wish' book.id %}">
+                                        <button>Add to wishlist</button>
+                                    </a>
                                 </li>
                             {% endfor %}
                         </ul>
