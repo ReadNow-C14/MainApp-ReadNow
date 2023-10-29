@@ -1,54 +1,71 @@
 {% extends 'base.html' %}
 
+{% load static %}
+{% block meta %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha384-KyZXEAg3QhqLMpG8r+J4jsl5c9zdLKaUk5Ae5f5b1bw6AUn5f5v8FZJoMxm6f5cH1" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
+{% endblock meta %}
+
 {% block content %}
 
 <body>
-    <p id="total-products">Saat ini Anda sedang meminjam {{ total_borrowed_books }} buku</p>
-    <ul>
-        {% for borrowed_book in borrowed_books %}
-            <li>{{ borrowed_book.book.title }} - Tanggal Pengembalian: {{ borrowed_book.return_date }}</li>
-        {% empty %}
-            <li>Anda belum meminjam buku apapun.</li>
-        {% endfor %}
-        </ul>
+    <p id="total_borrowed_books">Saat ini Anda sedang meminjam {{ total_borrowed_books }} buku</p>
+
     <div class="row" id="borrowed_book_cards"></div>
 
 </body>
 
 <script>
-        async function getBorrowedBooks() {
+    async function getBorrowedBooks() {
         return fetch("{% url 'pinjam_buku:get_borrowed_book_json' %}").then((res) => res.json())
     }
     async function refreshBorrowedBooks() {
-        const borrowedBooks = await getBorrowedBooks();
-        const borrowedBookCardsElement = document.getElementById("borrowed_book_cards");
-        borrowedBookCardsElement.innerHTML = "";
+        const borrowedBooks = await getBorrowedBooks()
+        const borrowedBooksCardElement = document.getElementById("borrowed_book_cards");
+        borrowedBooksCardElement.innerHTML = "";
 
-        borrowedBooks.forEach((item, index) => {
+        borrowedBooks.forEach((book) => {
             const card = document.createElement("div");
-            card.classList.add("col-md-4", "mb-3", "card");
+            card.classList.add("col-12", "col-md-6", "col-lg-3");
 
             card.innerHTML = `
-                <li class="book-details bg-white p-4 shadow-md rounded-md">
-                    <h3 class="text-lg font-semibold">${item.fields.title}</h3>
-                    <p class="text-gray-600">Author: ${item.fields.authors}</p>
-                    <p class="text-gray-600">Number of Pages: ${item.fields.num_of_pages }</p>
-                    <p class="text-gray-600">Rating: ${item.fields.rating }}</p>
-                    <img src="${item.fields.image_url}" alt="${item.fields.title } Cover" class="book-image mb-4">
-                    <div class="btn-container">
-                        <button class="btn btn-danger" onClick="returnBook(${item.pk})">Return Book</button>
+                <div class="card text-center">
+                    <div class="card-header">
+                        <h5 class="card-title">
+                            ${ book.fields.title }
+                        </h5>
                     </div>
-                </li>
+                    <div class="card-body">
+                        <img src="${ book.fields.image_url }" alt=""><br>
+                        <table>
+                            <tr>Pages</tr>
+                            <tr>: ${ book.fields.num_of_pages }</tr>
+                        </table>
+                        <table>
+                            <tr>ISBN Number</tr>
+                            <tr>: ${ book.fields.isbn }</tr>
+                        </table>
+                    </div>
+                    <div class="card-footer">
+                        <button type="button" class="btn btn-danger" id="button_remove" data-bookid="${book.pk}" onclick="returnBook(${book.pk})">Return Book</button>
+                    </div>
+                </div>
             `;
-        });
-    }
 
-    refreshProducts()
+            borrowedBooksCardElement.appendChild(card);
+        });
+        const totalBorrowedBooks = document.getElementById("total_borrowed_books");
+        totalBorrowedBooks.textContent = `Saat ini Anda sedang meminjam ${borrowedBooks.length} buku`;
+    }
+    refreshBorrowedBooks()
 
     function returnBook(pk) {
-        fetch(`/return_book_ajax/${pk}`, {
+        console.log(pk)
+        fetch(`/pinjam/return-book-ajax/${pk}`, {
             method: 'DELETE',
-        }).then(refreshProducts);
+        }).then(refreshBorrowedBooks);
         alert("Buku telah dikembalikan");
     }
 

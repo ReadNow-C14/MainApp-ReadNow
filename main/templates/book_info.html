@@ -34,14 +34,15 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" id="button_borrow" data-bs-dismiss="modal" data-book-id="{{ book.pk }}">Pinjam buku</button>
+                    <button type="button" class="btn btn-primary" id="button_borrow" data-bs-dismiss="modal" data-book-id="{{ book.pk }}">Borrow Book</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Pinjam Buku</button>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" id="button_pinjam"></button>
     {% endif %}
+
 </body>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -53,20 +54,22 @@
     }
 
     async function refreshBook() {
-        console.log("masuk fungsi refresh")
         const book = await getBooks();
-        const bookStatus = document.getElementById("status_buku");
-        if (book.status === 'Available') {
-            borrowButton.textContent = `Status: Available`;
-        } else if (book.status === 'Borrowed') {
-            borrowButton.textContent = `Status: Borrowed`;
-        }
+        console.log(book[0].fields.status)
 
+        const bookStatus = document.getElementById("status_buku");
+        const buttonPinjam = document.getElementById('button_pinjam');
         const borrowButton = document.getElementById('button_borrow');
-        if (book.status === 'Available') {
-            borrowButton.textContent = 'Pinjam Buku';
-        } else if (book.status === 'Borrowed') {
-            borrowButton.textContent = 'Kembalikan Buku';
+
+        if (book[0].fields.status === 'Available') {
+            bookStatus.textContent = `Status: Available`;
+            borrowButton.textContent = 'Borrow Book';
+            buttonPinjam.textContent = 'Borrow Book';
+        } else {
+            bookStatus.textContent = `Status: Borrowed`;
+            borrowButton.textContent = 'Return Book';
+            buttonPinjam.textContent = 'Borrowed';
+            buttonPinjam.disabled = true;
         }
     }
     refreshBook();
@@ -88,8 +91,6 @@
         const bookId = document.querySelector('#button_borrow').getAttribute('data-book-id'); 
         borrowBook(bookId);
     }
-
-
 
 </script>
 
