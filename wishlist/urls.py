@@ -4,12 +4,12 @@ from .views import *
 app_name = 'wishlist'
 
 urlpatterns = [
-    # AJAX
-    path('add-wish-ajax/', add_wish_ajax, name='add_wish_ajax'),
-    path('delete-wish-ajax/<int:id>/', delete_wish_ajax, name='delete_wish_ajax'),
-    # Sinkronus
-    path('add-wish/<int:id>/', add_wish, name='add_wish'),
-    path('delete-wish/<int:id>/', delete_wish, name='delete_wish'),
+    # CRUD
+    path('add-book/<int:book_id>/', add_book, name='add_book'),
+    # wishlist
     path('get-wishlist/', get_wishlist_json, name='get_wishlist_json'),
-    path('', show_whishlist, name='show_whishlist'),
+    path('my-wishlist/', show_whishlist, name='show_whishlist'),
+    # book list
+    path('get-books/', get_books_json, name='get_books_json'),
+    path('', show_books, name='show_books'),
 ]
