@@ -10,9 +10,4 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='book',
-            name='status',
-            field=models.CharField(choices=[('Available', 'a'), ('Borrowed', 'b')], default='Available', max_length=10),
-        ),
     ]
