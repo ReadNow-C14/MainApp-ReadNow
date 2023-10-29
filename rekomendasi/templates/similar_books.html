@@ -1,22 +1,30 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
-    <div class="background-purple">
+
+    <!-- Font Montserrat -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap" rel="stylesheet">
+
+    <!-- External Stylesheet -->
+    <link rel="stylesheet" type="text/css" href=" {% static 'admin/css/styles.css' %} ">
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha384-KyZXEAg3QhqLMpG8r+J4jsl5c9zdLKaUk5Ae5f5b1bw6AUn5f5v8FZJoMxm6f5cH1" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
+
+    <!-- Content -->
+    <div class="background-purple" style="padding-bottom: 80px;">
         <nav class="navbar navbar-expand-lg">
             <div class="container mt-3">
                 <a class="navbar-brand d-flex align-items-center justify-content-center" style="color:white; font-family: 'Montserrat', sans-serif;">
-                    <img src="{% static 'icon-recommendation.png' %}" alt="Logo" width="50" height="40" class="d-inline-block align-text-top me-1">
+                    <img src="{% static 'icon-recommendation.png' %}" alt="Logo" width="50" height="40" class="d-inline-block align-text-top me-1 book-image">
                     Rekomendasi Buku</a>
 
-                <!-- Filtering without ajax
-                <form class="d-flex" role="filter" method="get" action="{% url 'rekomendasi:similar_books' main_book.id %}">
-                    <label class = "nav-item" for="publishYear"></label>
-                    <input class="form-control me-2" placeholder="Tahun Terbit" aria-label="Tahun Terbit" type="number" name="publishYear" id="publishYear" min="0" step="1">
-                    <input type="button" value="Filter" class="btn btn-primary mx-1">
-                    <button type="button" class="btn btn-primary mx-1" onclick="getFilteredBooks()">Filter</button>
-                    <a href="{% url 'rekomendasi:similar_books' main_book.id %}" class="btn btn-warning mx-1">Reset</a>
-                </form> -->
-
+                <!-- Filter with AJAX -->
                 <form id="filterForm" class="d-flex" role="search" method="get" onsubmit="return false">
                     <label class = "nav-item" for="publishYear"></label>
                     <input class="form-control me-2" placeholder="Masukkan tahun terbit" aria-label="Tahun Terbit" type="number" name="publishYear" id="publishYear" min="0" step="1">
@@ -26,7 +34,7 @@
             </div>
         </nav>
 
-        <section class="hero" stye="padding:80px 0">
+        <section class="hero" stye="padding:80px 0;">
             <div class="container">
                 <div class="row">
                     <div class="row d-flex align-items-center justify-content-center">
@@ -41,7 +49,7 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <img src="{% static '4.png' %}" alt="book-icon" width="450" height="350" style="margin-left:80px;">
+                            <img class="icon-book-3d" src="{% static '4.png' %}" alt="book-icon" width="450" height="350" style="margin-left:80px;">
                         </div>
                     </div>
                 </div>
@@ -74,39 +82,60 @@
         </div>
     </div>
 
-    <div class="container mt-5" id="book_list">
-        <h3>Rekomendasi buku ini didapatkan dari tingkat kemiripian beberapa karakteristik buku seperti rating, jumlah review, dan lain sebagainya. </h3>
-        {% for recommendation in recommendation_books %}
-            <div class="book_rec" id="bookRec">
-                <img src="{{ recommendation.recommended_book.image_url }}" alt="{{ recommendation.recommended_book.title }}">
-                <h4>{{ recommendation.recommended_book.title }}</h4>
-                <p>Author: {{ recommendation.recommended_book.authors }}</p>
-                <p>Rating: {{ recommendation.recommended_book.rating }}</p>
-                <p>Informasi buku:</p>
-            </div>
-        {% endfor %}
+    <div class="container mt-5 mb-5" id="book_list">
+        <div class="book-grid">
+            {% for recommendation in recommendation_books %}
+                <div class="card" style="width: 120px;">
+                    <img src="{{ recommendation.recommended_book.image_url }}" class="card-img-top" alt="{{ recommendation.recommended_book.title }}" height="180px" style="object-fit: cover;">
+                    <div class="card-body">
+                        <h5 class="card-title" style="font-size: 12px;">{{ recommendation.recommended_book.title }}</h5>
+                        <p class="card-text" style="font-size: 10px;">{{ recommendation.recommended_book.authors }}</p>
+                        <a href="#" class="btn btn-primary" id="purple-button" style="font-size: 8px; padding: 5px 10px; ">Lihat Buku</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
     </div>
+
+    <hr>
+
+    <div class="d-flex align-items-center justify-content-center">
+        {% if user.is_authenticated %}
+            <!-- Konten yang hanya ditampilkan untuk pengguna yang sudah login -->
+            <p>Ini adalah tampilan rekomendasi berdasarkan wishlist kamu</p>
+        {% else %}
+            <!-- Konten yang hanya ditampilkan untuk pengguna yang belum login -->
+            <p>Silakan <a href="{% url 'main:login' %}">login</a> untuk melihat rekomendasi berdasarkan wishlist kamu.</p>
+        {% endif %}
+    </div>
+
+    
+
+    
 
     <script>
         async function getFilteredBooks() {
             const selectedYear = document.getElementById('publishYear').value;
             const url = `{% url 'rekomendasi:filter_books_ajax' main_book.id %}?publishYear=${selectedYear}`;
             
-            // HARUS DIEDIT FIX BANGET INI MASIH BELOM BENER YAGAYA
             const response = await fetch(url);
             if (response.ok) {
                 document.getElementById("book_list").innerHTML = ""
                 const books = await response.json();
 
-                let htmlString = `<h3>Rekomendasi buku ini didapatkan dari tingkat kemiripian beberapa karakteristik buku seperti rating, jumlah review, dan lain sebagainya. </h3>`
+                let htmlString = `<div class="container mt-5" id="book_list">
+                    <div class="book-grid">`
                     books.forEach((book) => {
-                        htmlString += `\n<div class="book_rec" id="bookRec">
-                        <img src="${book.image_url}" alt="${book.title}">
-                        <h4>${book.title}</h4>
-                        <p>Author: ${book.authors}</p>
-                        <p>Rating: ${book.rating}</p>
-                        <p>Informasi buku:</p>
-                    </div>` 
+                        htmlString += `\n<div class="card" style="width: 120px;">
+                                        <img src="${book.image_url}" class="card-img-top" alt="${book.title}" height="180px" style="object-fit: cover;">
+                                        <div class="card-body">
+                                            <h5 class="card-title" style="font-size: 12px;">${book.title}</h5>
+                                            <p class="card-text" style="font-size: 10px;">${book.authors}</p>
+                                            <a href="#" class="btn btn-primary" id="purple-button" style="font-size: 8px; padding: 5px 10px; ">Lihat Buku</a>
+                                        </div>
+                                    </div>
+                            </div>
+                        </div>`
                     })
                     
                     document.getElementById("book_list").innerHTML = htmlString

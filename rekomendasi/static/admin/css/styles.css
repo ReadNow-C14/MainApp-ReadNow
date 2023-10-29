@@ -5,3 +5,49 @@
     padding-bottom: 50px;
     color:white
 }
+
+.book-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr); 
+    gap: 25px; 
+}
+
+.card-title {
+    font-size: 12px;
+    white-space: nowrap; /* Mencegah teks melipat ke baris berikutnya */
+    overflow: hidden; /* Menyembunyikan teks yang melebihi lebar */
+    text-overflow: ellipsis; /* Menambahkan "..." untuk teks yang terlalu panjang */
+}
+
+.card-text {
+    font-size: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.card:hover .card-title,
+.card:hover .card-text {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+}
+
+/* Mengubah jumlah kolom menjadi 1 di tampilan perangkat mobile (kurang dari 768px) */
+@media (max-width: 768px) {
+    .book-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .icon-book-3d, .book-image {
+        display: none; /* Sembunyikan gambar */
+    }
+}
+
+/* Gambar akan ditampilkan hanya pada lebar layar lebih besar dari 768px (perangkat selain seluler) */
+@media (min-width: 768px) {
+    .icon-book-3d, .book-image {
+        display: block; /* Tampilkan gambar */
+    }
+}
+

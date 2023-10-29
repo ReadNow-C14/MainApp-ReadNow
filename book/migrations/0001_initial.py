@@ -38,6 +38,7 @@ class Migration(migrations.Migration):
                 ('publish_month', models.IntegerField(blank=True, null=True)),
                 ('publish_year', models.IntegerField(blank=True, null=True)),
                 ('status',models.CharField(choices=[('Available', 'a'), ('Borrowed', 'b')], default='Available', max_length=10)),
+                ('return_date',models.DateField(blank=True, null=True)),
             ],
         ),
     ]

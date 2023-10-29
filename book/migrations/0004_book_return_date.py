@@ -10,9 +10,4 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='book',
-            name='return_date',
-            field=models.DateField(blank=True, null=True),
-        ),
     ]
