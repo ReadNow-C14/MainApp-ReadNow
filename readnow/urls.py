@@ -25,4 +25,5 @@ urlpatterns = [
     path('wishlist/', include('wishlist.urls')),
     path('review/', include('review_buku.urls')),
     path('pinjam/', include('pinjam_buku.urls')),
+    path('auth/', include('authentication.urls')),
 ]
