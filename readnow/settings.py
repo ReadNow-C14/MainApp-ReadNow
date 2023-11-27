@@ -33,6 +33,13 @@ PRODUCTION = env.bool('PRODUCTION', False)
 DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SAMESITE = 'None'
+CSRF_TRUSTED_ORIGINS = ['https://readnow-c14-tk.pbp.cs.ui.ac.id']
 
 
 # Application definition
@@ -44,6 +51,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'authentication',
+    'corsheaders',
     'book',             # Aplikasi untuk menyimpan data buku
     'main',             # Rachel Heningtyas Zanetta Erari (2206081944)
     'pinjam_buku',      # Harjuno Abdullah (2206814053)
@@ -61,6 +70,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 
 ]
 
