@@ -69,6 +69,16 @@ def get_recommendations_json(request):
     data = BookRecommendation.objects.all()
     return HttpResponse(serializers.serialize("json",data),content_type="application/json")
 
+def get_recommendations_json_by_id(request, id):
+    book = Book.objects.get(pk = id)
+
+    # Periksa apakah rekomendasi sudah ada
+    if not has_recommendations(book):
+        init_recommend_book(book)
+
+    recommendation_books = BookRecommendation.objects.filter(source_book=book)
+    return HttpResponse(serializers.serialize("json",recommendation_books),content_type="application/json")
+
 @csrf_exempt
 def filter_books_ajax(request, id):
     book = Book.objects.get(pk = id)
