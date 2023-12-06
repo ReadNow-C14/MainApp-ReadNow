@@ -76,7 +76,9 @@ def get_recommendations_json_by_id(request, id):
     if not has_recommendations(book):
         init_recommend_book(book)
 
-    recommendation_books = BookRecommendation.objects.filter(source_book=book)
+    recommendation_id = book.get_indices_as_list()
+
+    recommendation_books = Book.objects.filter(pk__in=recommendation_id)
     return HttpResponse(serializers.serialize("json",recommendation_books),content_type="application/json")
 
 @csrf_exempt
