@@ -5,6 +5,7 @@ from book.models import Book
 from wishlist.models import Wishlist
 from .models import BookRecommendation
 from django.views.decorators.csrf import csrf_exempt
+import json
 
 
 
@@ -76,10 +77,33 @@ def get_recommendations_json_by_id(request, id):
     if not has_recommendations(book):
         init_recommend_book(book)
 
-    recommendation_id = book.get_indices_as_list()
+    recommendation_id = [i+1 for i in book.get_indices_as_list()][1:]
 
     recommendation_books = Book.objects.filter(pk__in=recommendation_id)
+
+    # Request method POST
+    if request.method == 'POST':
+        selected_publish_year = json.loads(request.body)['publishedYear']
+        if selected_publish_year:
+            # Jika tahun penerbitan sudah ada dalam request, maka filter berdasarkan tahun
+            recommendation_books = recommendation_books.filter(
+                publish_year=selected_publish_year
+            )
+
+    
     return HttpResponse(serializers.serialize("json",recommendation_books),content_type="application/json")
+
+@csrf_exempt
+def get_recommendations_json_by_isbn(request):
+    if request.method == 'GET':
+        
+        data = request.GET.get('isbn')
+        book = Book.objects.get(isbn=data)
+
+        # Masih perlu dicek apakah terjadi error kalau tidak ada json response status
+        return get_recommendations_json_by_id(request, book.pk)
+    else:
+        return JsonResponse({"status": "error"}, status=401)
 
 @csrf_exempt
 def filter_books_ajax(request, id):
