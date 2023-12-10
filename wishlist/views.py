@@ -32,17 +32,16 @@ def search_book(request, isbn):
 
 
 def show_whishlist(request):
-    # Menampilkan wishlist
-    wishlists = Wishlist.objects.all()
+    # Menampilkan wishlist by user
+    wishlists = Wishlist.objects.filter(user=request.user)
     context = {
         'my_wishlist': wishlists
     }
     return render(request, 'wishlist.html', context)
 
 def get_wishlist_json(request):
-    # TODO: buat filter berdasarkan user, karena saat ini ambil semua objek buku
-    # Mengambil semua object wishlist
-    wishlist = Wishlist.objects.all()
+    # Mengambil semua object wishlist by user
+    wishlist = Wishlist.objects.filter(user=request.user)
     books = [wish.book for wish in wishlist]
     return HttpResponse(serializers.serialize("json",books),content_type="application/json")
 
