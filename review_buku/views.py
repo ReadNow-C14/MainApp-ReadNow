@@ -9,6 +9,7 @@ from django.core import serializers
 from django.shortcuts import redirect, render
 from django.contrib import messages
 from datetime import datetime
+import json
 
 def reviews_for_book(request, book_id):
     book = Book.objects.get(id=book_id)
@@ -47,7 +48,6 @@ def submit_review(request, book_id):
 @login_required(login_url='/login/')
 @csrf_exempt
 def submit_review_ajax(request, book_id):
-    url = request.META.get('HTTP_REFERER')
     if request.method == 'POST':
         try:
             reviews = Review.objects.get(user__id=request.user.id, book__id=book_id)
@@ -76,3 +76,26 @@ def get_review_json(request, book_id):
             'rating': review.rating, }
             for review in data_review]
     return JsonResponse(data,safe=False)
+
+@login_required(login_url='/login/')
+@csrf_exempt
+def submit_review_flutter(request, book_id):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        try:
+            reviews = Review.objects.get(user__id=data['user_id'], book__id=book_id)
+            form = ReviewForm(data, instance=reviews)
+        except Review.DoesNotExist:
+            form = ReviewForm(data)
+
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.user_id = data['user_id']
+            review.book_id = book_id
+            review.save()
+            
+            # Return a success response in JSON format
+            return JsonResponse({'message': 'Review submitted successfully'}, status=201)
+        else:
+            # Return an error response in JSON format
+            return JsonResponse({'error': 'Form submission invalid'}, status=400)
