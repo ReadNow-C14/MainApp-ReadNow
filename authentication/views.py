@@ -30,7 +30,7 @@ def login(request):
     else:
         return JsonResponse({
             "status": False,
-            "message": "LLogin failed, please re-check your username or password."
+            "message": "Login failed, please re-check your username or password."
         }, status=401)
     
 @csrf_exempt
