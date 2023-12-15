@@ -86,25 +86,45 @@ def get_review_json(request, book_id):
     return JsonResponse(data, safe=False)
 
 
+# @csrf_exempt
+# def submit_review_flutter(request, book_id):
+#     if request.method == 'POST':
+#         data = json.loads(request.body.decode('utf-8'))
+#         user = User.objects.get(username=data['user'])
+#         book = Book.objects.get(id=book_id)
+
+#         try:
+#             review = Review.objects.get(user=user, book=book)
+#             form = ReviewForm(data, instance=review)
+#         except Review.DoesNotExist:
+#             form = ReviewForm(data)
+
+#         if form.is_valid():
+#             review = form.save(commit=False)
+#             review.user = user
+#             review.book = book
+#             review.save()
+#             return JsonResponse({'message': 'Review updated successfully'}, status=201)
+#         else:
+#             return JsonResponse({'error': 'Invalid data'}, status=400)
+        
 @csrf_exempt
-def submit_review_flutter(request, book_id):
+def submit_review_flutter(request):
     if request.method == 'POST':
-        data = json.loads(request.body.decode('utf-8'))
-        user = User.objects.get(username=data['user'])
-        book = Book.objects.get(id=book_id)
+        
+        data = json.loads(request.body)
 
-        try:
-            review = Review.objects.get(user=user, book=book)
-            form = ReviewForm(data, instance=review)
-        except Review.DoesNotExist:
-            form = ReviewForm(data)
+        new_product = Review.objects.create(
+            user = request.user,
+            book = data["book"],
+            rating = int(data["rating"]),
+            comment = data["comment"],
+            created_at = datetime.now()
+        )
 
-        if form.is_valid():
-            review = form.save(commit=False)
-            review.user = user
-            review.book = book
-            review.save()
-            return JsonResponse({'message': 'Review updated successfully'}, status=201)
-        else:
-            return JsonResponse({'error': 'Invalid data'}, status=400)
+        new_product.save()
+
+        return JsonResponse({"status": "success"}, status=200)
+    else:
+        return JsonResponse({"status": "error"}, status=401)
 
