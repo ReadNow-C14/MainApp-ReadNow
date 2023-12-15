@@ -85,35 +85,10 @@ def get_review_json(request, book_id):
             for review in data_review]
     return JsonResponse(data, safe=False)
 
-
-# @csrf_exempt
-# def submit_review_flutter(request, book_id):
-#     if request.method == 'POST':
-#         data = json.loads(request.body.decode('utf-8'))
-#         user = User.objects.get(username=data['user'])
-#         book = Book.objects.get(id=book_id)
-
-#         try:
-#             review = Review.objects.get(user=user, book=book)
-#             form = ReviewForm(data, instance=review)
-#         except Review.DoesNotExist:
-#             form = ReviewForm(data)
-
-#         if form.is_valid():
-#             review = form.save(commit=False)
-#             review.user = user
-#             review.book = book
-#             review.save()
-#             return JsonResponse({'message': 'Review updated successfully'}, status=201)
-#         else:
-#             return JsonResponse({'error': 'Invalid data'}, status=400)
-        
 @csrf_exempt
-def submit_review_flutter(request):
+def submit_review_flutter(request, book_id):
     if request.method == 'POST':
-        
         data = json.loads(request.body)
-
         new_product = Review.objects.create(
             user = request.user,
             book = data["book"],
