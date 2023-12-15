@@ -97,6 +97,7 @@ def submit_review_flutter(request, book_id):
             book=data['book'],
             comment=data['comment'],
             rating=data['rating'],
+            createdAt=datetime.datetime.now()
         )
         review.save()
         return JsonResponse({'message': 'Review submitted successfully'}, status=201)
