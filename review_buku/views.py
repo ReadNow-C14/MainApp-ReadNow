@@ -90,7 +90,7 @@ def submit_review_flutter(request, book_id):
 
         if form.is_valid():
             review = form.save(commit=False)
-            review.user_id = data['user_id']
+            review.user = data['user']
             review.book_id = book_id
             review.save()
             
