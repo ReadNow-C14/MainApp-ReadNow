@@ -73,7 +73,6 @@ def submit_review_ajax(request, book_id):
             messages.error(request, 'There was an error with your submission.')
             return HttpResponseNotFound()
 
-
 def get_review_json(request, book_id):
     book = Book.objects.get(pk=book_id)
     data_review = Review.objects.filter(book=book)
@@ -85,47 +84,48 @@ def get_review_json(request, book_id):
             for review in data_review]
     return JsonResponse(data, safe=False)
 
+
+# def submit_review_flutter(request, book_id):
+#     if request.method == 'POST':
+#         # Anda mungkin perlu menyesuaikan bagian ini untuk deserialisasi JSON
+#         data = json.loads(request.body)
+
+#         try:
+#             # Jika Anda menggunakan `request.user`, pastikan request tersebut sudah memiliki user yang terautentikasi
+#             reviews = Review.objects.get(user=request.user.id, book__id=book_id)
+#             form = ReviewForm(request.POST, instance=reviews)
+#         except Review.DoesNotExist:
+#             form = ReviewForm(request.POST)
+
+#         if form.is_valid():
+#             review = form.save(commit=False)
+#             review.user = request.user
+#             review.book_id = book_id
+#             review.save()
+
+#             # Mengembalikan JsonResponse dengan status 'created'
+#             return JsonResponse({'status': 'success', 'message': 'Review created successfully'}, status=201)
+#         else:
+#             # Mengembalikan JsonResponse dengan pesan error
+#             return JsonResponse({'status': 'error', 'message': 'There was an error with your submission'}, status=400)
+#     else:
+#         # Metode HTTP tidak diizinkan
+#         return JsonResponse({'status': 'error', 'message': 'HTTP method not allowed'}, status=405)
 @csrf_exempt
 def submit_review_flutter(request, book_id):
     if request.method == 'POST':
-        # Anda mungkin perlu menyesuaikan bagian ini untuk deserialisasi JSON
-        # data = json.loads(request.body)
+        data = json.loads(request.body)
+        new_product = Review.objects.create(
+            user = request.user,
+            book = Book.objects.get(pk=data["book"]),
+            rating = int(data["rating"]),
+            comment = data["comment"],
+            created_at = datetime.now()
+        )
 
-        try:
-            # Jika Anda menggunakan `request.user`, pastikan request tersebut sudah memiliki user yang terautentikasi
-            reviews = Review.objects.get(user=request.user.id, book__id=book_id)
-            form = ReviewForm(request.POST, instance=reviews)
-        except Review.DoesNotExist:
-            form = ReviewForm(request.POST)
+        new_product.save()
 
-        if form.is_valid():
-            review = form.save(commit=False)
-            review.user = request.user
-            review.book_id = book_id
-            review.save()
-
-            # Mengembalikan JsonResponse dengan status 'created'
-            return JsonResponse({'status': 'success', 'message': 'Review created successfully'}, status=201)
-        else:
-            # Mengembalikan JsonResponse dengan pesan error
-            return JsonResponse({'status': 'error', 'message': 'There was an error with your submission'}, status=400)
+        return JsonResponse({"status": "success"}, status=200)
     else:
-        # Metode HTTP tidak diizinkan
-        return JsonResponse({'status': 'error', 'message': 'HTTP method not allowed'}, status=405)
-# def submit_review_flutter(request, book_id):
-#     if request.method == 'POST':
-#         data = json.loads(request.body)
-#         new_product = Review.objects.create(
-#             user = request.user,
-#             book = data["book"],
-#             rating = int(data["rating"]),
-#             comment = data["comment"],
-#             created_at = datetime.now()
-#         )
-
-#         new_product.save()
-
-#         return JsonResponse({"status": "success"}, status=200)
-#     else:
-#         return JsonResponse({"status": "error"}, status=401)
+        return JsonResponse({"status": "error"}, status=401)
 
