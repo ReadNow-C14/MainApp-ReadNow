@@ -4,6 +4,9 @@ from .views import *
 app_name = 'wishlist'
 
 urlpatterns = [
+    # Flutter
+    path('remove-wishlist-flutter/<int:book_id>/', remove_wishlist_flutter, name='remove_wishlist_flutter'),
+    path('add-wishlist-flutter/<int:book_id>/', add_wishlist_flutter, name='add_wishlist_flutter'),
     # CRUD
     path('add-book/<int:book_id>/', add_book, name='add_book'),
     path('remove-book/<int:book_id>/', remove_book, name='remove_book'),
