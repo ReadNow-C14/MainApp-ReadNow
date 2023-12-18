@@ -70,6 +70,8 @@ def get_recommendations_json(request):
     data = BookRecommendation.objects.all()
     return HttpResponse(serializers.serialize("json",data),content_type="application/json")
 
+
+@csrf_exempt
 def get_recommendations_json_by_id(request, id):
     book = Book.objects.get(pk = id)
 

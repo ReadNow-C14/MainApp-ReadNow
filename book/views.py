@@ -9,3 +9,6 @@ def get_books(request):
     return HttpResponse(serializers.serialize("json",data),content_type="application/json")
 
 # Create your views here.
+def get_book_by_isbn(request,isbn):
+    data = Book.objects.filter(isbn=isbn)
+    return HttpResponse(serializers.serialize("json",data),content_type="application/json")
