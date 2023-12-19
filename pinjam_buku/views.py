@@ -66,6 +66,7 @@ def return_book_ajax(request, id):
             book.delete()
     return HttpResponse(b"RETURNED", status=201)
 
+@login_required(login_url='/login')
 @csrf_exempt
 def borrow_book_flutter(request, id):
     if request.method == 'POST':
