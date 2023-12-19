@@ -4,6 +4,9 @@ from .models import Wishlist
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, HttpResponseNotFound
 from django.core import serializers
 import json
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth import get_user
 
 # Create your views here.
 
@@ -32,20 +35,49 @@ def search_book(request, isbn):
 
 
 def show_whishlist(request):
-    # Menampilkan wishlist
-    wishlists = Wishlist.objects.all()
+    # Menampilkan wishlist by user
+    wishlists = Wishlist.objects.filter(user=request.user)
     context = {
         'my_wishlist': wishlists
     }
     return render(request, 'wishlist.html', context)
 
 def get_wishlist_json(request):
-    # TODO: buat filter berdasarkan user, karena saat ini ambil semua objek buku
-    # Mengambil semua object wishlist
-    wishlist = Wishlist.objects.all()
+    # Mengambil semua object wishlist by user
+    wishlist = Wishlist.objects.filter(user=request.user)
     books = [wish.book for wish in wishlist]
     return HttpResponse(serializers.serialize("json",books),content_type="application/json")
 
+# ==================== Flutter ====================
+@login_required(login_url='/login')
+@csrf_exempt
+def add_wishlist_flutter(request, book_id):
+    if request.method == 'POST':
+        # Ambil buku yang sesuai dengan book_id
+        book = Book.objects.get(pk=book_id)
+        user = request.user
+        # Cek apakah buku sudah ada di wishlist
+        if Wishlist.objects.filter(user=user, book=book).exists():
+            # Kirim status bahwa data sudah ada
+            return JsonResponse({"status": "existed"}, status=200)
+        wishlist = Wishlist(user=user, book=book)
+        wishlist.save()
+        return JsonResponse({"status": "success"}, status=201)
+    else:
+        return JsonResponse({"status": "error"}, status=401)
+
+@login_required(login_url='/login')
+@csrf_exempt
+def remove_wishlist_flutter(request, book_id):
+    book = Book.objects.get(pk=book_id)
+    user = get_user(request)
+    if Wishlist.objects.filter(user=user, book=book).exists():
+        # Kirim status bahwa data sudah ada
+        wishlist = Wishlist.objects.get(user=user, book=book)
+        wishlist.delete()
+        return JsonResponse({"status": "success"}, status=200)
+    else:
+        return JsonResponse({"status": "not found"}, status=404)
 
 # ---------- Views for CRUD ----------
 def remove_book(request, book_id):
