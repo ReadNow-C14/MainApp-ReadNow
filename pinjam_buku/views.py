@@ -12,6 +12,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from .models import Book
 from django.http import JsonResponse
+import json
 
 # Create your views here.
 
@@ -31,6 +32,11 @@ def borrowed_books(request):
 def get_borrowed_book_json(request):
     borrowed_books = BorrowedBook.objects.filter(user=request.user)
     books = [borrowed.book for borrowed in borrowed_books]
+    return HttpResponse(serializers.serialize("json",books),content_type="application/json")
+
+def get_borrowed_book_jsonn(request):
+    borrowed_books = BorrowedBook.objects.all()
+    books = [borrowed for borrowed in borrowed_books]
     return HttpResponse(serializers.serialize("json",books),content_type="application/json")
 
 @csrf_exempt
@@ -59,3 +65,27 @@ def return_book_ajax(request, id):
             book.book.save()
             book.delete()
     return HttpResponse(b"RETURNED", status=201)
+
+@csrf_exempt
+def borrow_book_flutter(request, id):
+    if request.method == 'POST':
+        
+        data = json.loads(request.body)
+        book = get_object_or_404(Book, pk=id)
+        return_date = data["return_date"]
+
+        book.status = "Borrowed"
+        book.return_date = return_date
+        book.save()
+
+        new_borrowed_book = BorrowedBook.objects.create(
+            user = request.user,
+            book = book,
+            return_date = return_date,
+        )
+
+        new_borrowed_book.save()
+
+        return JsonResponse({"status": "success"}, status=200)
+    else:
+        return JsonResponse({"status": "error"}, status=401)
