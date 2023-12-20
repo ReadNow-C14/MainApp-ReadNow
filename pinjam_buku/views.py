@@ -66,7 +66,7 @@ def borrow_book_flutter(request, book_id:int):
     if request.method == 'POST':
         
         data = json.loads(request.body)
-        print("data " + data)
+        print("data ", data)
         bookk = Book.objects.get(pk=book_id)
         return_date_str = data["return_date"]
         print("return_date_str ", return_date_str)
@@ -95,12 +95,42 @@ def borrow_book_flutteer(request, book_id:int):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
-            print("data " + data)
+            print("data ", data)
             bookk = Book.objects.get(pk=book_id)
             return_date_str = data["return_date"]
             print("return_date_str ", return_date_str)
             return_date = datetime.strptime(return_date_str, "%Y-%m-%d %H:%M:%S.%f")
             print("return_date ", return_date)
+
+            bookk.status = "Borrowed"
+            bookk.return_date = return_date
+            bookk.save()
+
+            new_borrowed_book = BorrowedBook(
+                user = request.user,
+                book = bookk,
+                return_date = return_date,
+            )
+
+            new_borrowed_book.save()
+
+            return JsonResponse({"status": "success"}, status=200)
+        except ValueError:
+            return HttpResponseBadRequest("Invalid date format")
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=500)
+    else:
+        return JsonResponse({"status": "error"}, status=401)
+
+@login_required(login_url='/login')
+@csrf_exempt
+def borrow_book_flutteeeer(request, book_id:int):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            bookk = Book.objects.get(pk=book_id)
+            return_date_str = data["return_date"]
+            return_date = datetime.strptime(return_date_str, "%Y-%m-%d %H:%M:%S.%f")
 
             bookk.status = "Borrowed"
             bookk.return_date = return_date
@@ -194,6 +224,7 @@ def return_book_ajax(request, id):
     borrowed_book = BorrowedBook.objects.filter(user=request.user)
     for book in borrowed_book:
         if book.book.id == id:
+            print("return")
             book.book.status = "Available"
             book.book.save()
             book.delete()
