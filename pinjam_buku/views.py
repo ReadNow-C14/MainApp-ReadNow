@@ -57,22 +57,22 @@ def borrow_book_ajax(request, id):
 
     return HttpResponseNotFound()
 
+@login_required(login_url='/login')
 @csrf_exempt
-def borrow_book_flutter(request):
+def borrow_book_flutter(request, book_id:int):
     if request.method == 'POST':
         
         data = json.loads(request.body)
-        book_id = data["book_id"]
-        book = Book.objects.get(Book, pk=book_id)
+        bookk = Book.objects.get(Book, pk=book_id)
         return_date = data["return_date"]
 
-        book.status = "Borrowed"
-        book.return_date = return_date
-        book.save()
+        bookk.status = "Borrowed"
+        bookk.return_date = return_date
+        bookk.save()
 
         new_borrowed_book = BorrowedBook(
             user = request.user,
-            book = book,
+            book = bookk,
             return_date = return_date,
         )
 
@@ -81,6 +81,22 @@ def borrow_book_flutter(request):
         return JsonResponse({"status": "success"}, status=200)
     else:
         return JsonResponse({"status": "error"}, status=401)
+
+@login_required(login_url='/login')
+@csrf_exempt
+def borrow_flutter(request, book_id):
+    if request.method == 'POST':
+        # Ambil buku yang sesuai dengan book_id
+        book = Book.objects.get(pk=book_id)
+        user = request.user
+        return_date = datetime.now()
+
+        borrowed = BorrowedBook(user=user, book=book, return_date = return_date)
+        borrowed.save()
+        return JsonResponse({"status": "success"}, status=201)
+    else:
+        return JsonResponse({"status": "error"}, status=401)
+
 
 @csrf_exempt
 def return_book_ajax(request, id):
