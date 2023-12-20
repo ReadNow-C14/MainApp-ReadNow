@@ -90,7 +90,7 @@ def borrow_flutter(request, book_id):
         # Ambil buku yang sesuai dengan book_id
         book = Book.objects.get(pk=book_id)
         user = request.user
-        return_date = datetime.now()
+        return_date = datetime.datetime.now()
 
         borrowed = BorrowedBook(user=user, book=book, return_date = return_date)
         borrowed.save()
@@ -105,15 +105,32 @@ def add_wishlist_flutterr(request, book_id):
         # Ambil buku yang sesuai dengan book_id
         book = Book.objects.get(pk=book_id)
         user = request.user
-        # Cek apakah buku sudah ada di wishlist
-        if Wishlist.objects.filter(user=user, book=book).exists():
-            # Kirim status bahwa data sudah ada
-            return JsonResponse({"status": "existed"}, status=200)
-        wishlist = Wishlist(user=user, book=book)
-        wishlist.save()
+        return_date = datetime.now()
+
+        borrowed = BorrowedBook(user=user, book=book, return_date = return_date)
+        borrowed.save()
         return JsonResponse({"status": "success"}, status=201)
     else:
         return JsonResponse({"status": "error"}, status=401)
+
+@csrf_exempt
+def borroww_book_flutter(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        book_title = data["book_title"]
+        book = get_object_or_404(Book, book_title=book_title)
+        return_date_str = data["return_date"]
+        return_date = datetime.strptime(return_date_str, "%Y-%m-%d %H:%M:%S.%f")
+        borrowed_book = BorrowedBook.objects.create(
+            user = request.user,
+            book = book,
+            return_date = return_date,
+        )
+        borrowed_book.save()
+        
+        return JsonResponse({"status":"success"}, status=200)
+    else:
+        return JsonResponse({"status":"error"}, status=401)
 
 @csrf_exempt
 def return_book_ajax(request, id):
