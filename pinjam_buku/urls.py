@@ -18,4 +18,5 @@ urlpatterns = [
     path('borrow-book-flutteer/<int:book_id>/', borrow_book_flutteer, name='borrow_book_flutteer'),
     path('borrow-book-flutteeer/<int:book_id>/', borrow_book_flutteeer, name='borrow_book_flutteeer'),
     path('borrow-book-flutteeeer/<int:book_id>/', borrow_book_flutteeeer, name='borrow_book_flutteeer'),
+    path('borrow/<int:book_id>/', borrow, name='borrow'),   
 ]

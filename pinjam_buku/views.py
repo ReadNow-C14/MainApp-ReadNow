@@ -16,6 +16,7 @@ import json
 from django.contrib.auth import get_user
 from wishlist.models import Wishlist
 from django.http import JsonResponse, HttpResponseBadRequest
+from datetime import datetime, timedelta
 
 # Create your views here.
 
@@ -218,6 +219,27 @@ def borroww_book_flutter(request):
         return JsonResponse({"status":"success"}, status=200)
     else:
         return JsonResponse({"status":"error"}, status=401)
+
+@login_required(login_url='/login')
+@csrf_exempt
+def borrow(request, book_id):
+    if request.method == 'POST':
+
+        data = json.loads(request.body)
+        book = Book.objects.get(pk=book_id)
+        user = request.user
+        return_date = data['return_date']
+
+        book.status = "Borrowed"
+        book.return_date = return_date
+        book.save()
+
+        borrowed = BorrowedBook(user=user, book=book, return_date = return_date)
+        borrowed.save()
+
+        return JsonResponse({"status": "success"}, status=201)
+    else:
+        return JsonResponse({"status": "error"}, status=401)
 
 @csrf_exempt
 def return_book_ajax(request, id):
