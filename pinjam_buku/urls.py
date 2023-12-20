@@ -12,4 +12,5 @@ urlpatterns = [
     path('borrow-book-flutter/<int:book_id>/', borrow_book_flutter, name='borrow_book_flutter'),
     path('return-borrowed-book-flutter/<int:book_id>/', return_borrowed_book_flutter, name='return_borrowed_book_flutter'),
     path('borrow-flutter/<int:book_id>/', borrow_flutter, name='borrow_flutter'),
+    path('add-wishlist-flutterr/<int:book_id>/', add_wishlist_flutterr, name='add_wishlist_flutterr'),
 ]

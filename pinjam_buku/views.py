@@ -14,6 +14,7 @@ from .models import Book
 from django.http import JsonResponse
 import json
 from django.contrib.auth import get_user
+from wishlist.models import Wishlist
 
 # Create your views here.
 
@@ -97,6 +98,22 @@ def borrow_flutter(request, book_id):
     else:
         return JsonResponse({"status": "error"}, status=401)
 
+@login_required(login_url='/login')
+@csrf_exempt
+def add_wishlist_flutterr(request, book_id):
+    if request.method == 'POST':
+        # Ambil buku yang sesuai dengan book_id
+        book = Book.objects.get(pk=book_id)
+        user = request.user
+        # Cek apakah buku sudah ada di wishlist
+        if Wishlist.objects.filter(user=user, book=book).exists():
+            # Kirim status bahwa data sudah ada
+            return JsonResponse({"status": "existed"}, status=200)
+        wishlist = Wishlist(user=user, book=book)
+        wishlist.save()
+        return JsonResponse({"status": "success"}, status=201)
+    else:
+        return JsonResponse({"status": "error"}, status=401)
 
 @csrf_exempt
 def return_book_ajax(request, id):
