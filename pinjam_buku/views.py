@@ -65,7 +65,7 @@ def borrow_book_flutter(request, book_id:int):
     if request.method == 'POST':
         
         data = json.loads(request.body)
-        bookk = Book.objects.get(Book, pk=book_id)
+        bookk = Book.objects.get(pk=book_id)
         return_date_str = data["return_date"]
         return_date = datetime.strptime(return_date_str, "%Y-%m-%d")
 
@@ -91,7 +91,7 @@ def borrow_book_flutteer(request, book_id:int):
     if request.method == 'POST':
         
         data = json.loads(request.body)
-        bookk = Book.objects.get(Book, pk=book_id)
+        bookk = Book.objects.get(pk=book_id)
         return_date_str = data["return_date"]
         return_date = datetime.strptime(return_date_str, "%Y-%m-%d %H:%M:%S.%f")
 
@@ -117,7 +117,7 @@ def borrow_book_flutteeer(request, book_id:int):
     if request.method == 'POST':
         
         data = json.loads(request.body)
-        bookk = Book.objects.get(Book, pk=book_id)
+        bookk = Book.objects.get(pk=book_id)
         return_date = datetime.datetime.now()
 
         bookk.status = "Borrowed"
@@ -186,19 +186,6 @@ def return_book_ajax(request, id):
             book.delete()
     return HttpResponse(b"RETURNED", status=201)
 
-@login_required(login_url='/login')
-@csrf_exempt
-def return_borrowed_book_flutter(request, book_id):
-    book = Book.objects.get(pk=book_id)
-    user = get_user(request)
-    if BorrowedBook.objects.filter(user=user, book=book).exists():
-        # Kirim status bahwa data sudah ada
-        borrowed = BorrowedBook.objects.get(user=user, book=book)
-        borrowed.delete()
-        return JsonResponse({"status": "success"}, status=200)
-    else:
-        return JsonResponse({"status": "not found"}, status=404)
-
 @csrf_exempt
 def return_book_flutter(request, id):
     try:
@@ -208,7 +195,7 @@ def return_book_flutter(request, id):
                 book.book.status = "Available"
                 book.book.save()
                 book.delete()
-        return JsonResponse({'message': 'Book returned successfully'})
+        return JsonResponse({"status": "success"})
     except BorrowedBook.DoesNotExist:
         return JsonResponse({'error': 'Book does not exist'})
 
