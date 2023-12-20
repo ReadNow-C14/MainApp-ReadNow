@@ -11,10 +11,11 @@ urlpatterns = [
 
     path('return-book-ajax/<int:id>', return_book_ajax, name='return_book_ajax'),
     path('return-book-flutter/<int:id>/', return_book_flutter, name='return_book_flutter'),
-    
+
     path('borrow-flutter/<int:book_id>/', borrow_flutter, name='borrow_flutter'),
     path('borroww_book_flutter/', borroww_book_flutter, name='borroww_book_flutter'),
     path('borrow-book-flutter/<int:book_id>/', borrow_book_flutter, name='borrow_book_flutter'),
     path('borrow-book-flutteer/<int:book_id>/', borrow_book_flutteer, name='borrow_book_flutteer'),
     path('borrow-book-flutteeer/<int:book_id>/', borrow_book_flutteeer, name='borrow_book_flutteeer'),
+    path('borrow-book-flutteeeer/<int:book_id>/', borrow_book_flutteeeer, name='borrow_book_flutteeer'),
 ]
