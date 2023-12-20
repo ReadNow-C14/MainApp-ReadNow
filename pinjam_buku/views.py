@@ -13,6 +13,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import Book
 from django.http import JsonResponse
 import json
+from django.contrib.auth import get_user
 
 # Create your views here.
 
@@ -57,16 +58,6 @@ def borrow_book_ajax(request, id):
     return HttpResponseNotFound()
 
 @csrf_exempt
-def return_book_ajax(request, id):
-    borrowed_book = BorrowedBook.objects.filter(user=request.user)
-    for book in borrowed_book:
-        if book.book.id == id:
-            book.book.status = "Available"
-            book.book.save()
-            book.delete()
-    return HttpResponse(b"RETURNED", status=201)
-
-@csrf_exempt
 def borrow_book_flutter(request):
     if request.method == 'POST':
         
@@ -90,3 +81,26 @@ def borrow_book_flutter(request):
         return JsonResponse({"status": "success"}, status=200)
     else:
         return JsonResponse({"status": "error"}, status=401)
+
+@csrf_exempt
+def return_book_ajax(request, id):
+    borrowed_book = BorrowedBook.objects.filter(user=request.user)
+    for book in borrowed_book:
+        if book.book.id == id:
+            book.book.status = "Available"
+            book.book.save()
+            book.delete()
+    return HttpResponse(b"RETURNED", status=201)
+
+@login_required(login_url='/login')
+@csrf_exempt
+def return_borrowed_book_flutter(request, book_id):
+    book = Book.objects.get(pk=book_id)
+    user = get_user(request)
+    if BorrowedBook.objects.filter(user=user, book=book).exists():
+        # Kirim status bahwa data sudah ada
+        borrowed = BorrowedBook.objects.get(user=user, book=book)
+        borrowed.delete()
+        return JsonResponse({"status": "success"}, status=200)
+    else:
+        return JsonResponse({"status": "not found"}, status=404)
