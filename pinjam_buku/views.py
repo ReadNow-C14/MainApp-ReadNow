@@ -198,3 +198,17 @@ def return_borrowed_book_flutter(request, book_id):
         return JsonResponse({"status": "success"}, status=200)
     else:
         return JsonResponse({"status": "not found"}, status=404)
+
+@csrf_exempt
+def return_book_flutter(request, id):
+    try:
+        borrowed_book = BorrowedBook.objects.filter(user=request.user)
+        for book in borrowed_book:
+            if book.book.id==id:
+                book.book.status = "Available"
+                book.book.save()
+                book.delete()
+        return JsonResponse({'message': 'Book returned successfully'})
+    except BorrowedBook.DoesNotExist:
+        return JsonResponse({'error': 'Book does not exist'})
+

@@ -10,6 +10,7 @@ urlpatterns = [
     path('borrowed-books/', borrowed_books, name='borrowed_books'),
     path('return-book-ajax/<int:id>', return_book_ajax, name='return_book_ajax'),
     path('return-borrowed-book-flutter/<int:book_id>/', return_borrowed_book_flutter, name='return_borrowed_book_flutter'),
+    path('return-book-flutter/<int:id>/', return_book_flutter, name='return_book_flutter'),
     path('borrow-flutter/<int:book_id>/', borrow_flutter, name='borrow_flutter'),
     path('borroww_book_flutter/', borroww_book_flutter, name='borroww_book_flutter'),
     path('borrow-book-flutter/<int:book_id>/', borrow_book_flutter, name='borrow_book_flutter'),
