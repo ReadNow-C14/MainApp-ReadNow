@@ -15,6 +15,7 @@ from django.http import JsonResponse
 import json
 from django.contrib.auth import get_user
 from wishlist.models import Wishlist
+from django.http import JsonResponse, HttpResponseBadRequest
 
 # Create your views here.
 
@@ -65,9 +66,12 @@ def borrow_book_flutter(request, book_id:int):
     if request.method == 'POST':
         
         data = json.loads(request.body)
+        print("data " + data)
         bookk = Book.objects.get(pk=book_id)
         return_date_str = data["return_date"]
+        print("return_date_str ", return_date_str)
         return_date = datetime.strptime(return_date_str, "%Y-%m-%d")
+        print("return_date ", return_date)
 
         bookk.status = "Borrowed"
         bookk.return_date = return_date
@@ -89,25 +93,32 @@ def borrow_book_flutter(request, book_id:int):
 @csrf_exempt
 def borrow_book_flutteer(request, book_id:int):
     if request.method == 'POST':
-        
-        data = json.loads(request.body)
-        bookk = Book.objects.get(pk=book_id)
-        return_date_str = data["return_date"]
-        return_date = datetime.strptime(return_date_str, "%Y-%m-%d %H:%M:%S.%f")
+        try:
+            data = json.loads(request.body)
+            print("data " + data)
+            bookk = Book.objects.get(pk=book_id)
+            return_date_str = data["return_date"]
+            print("return_date_str ", return_date_str)
+            return_date = datetime.strptime(return_date_str, "%Y-%m-%d %H:%M:%S.%f")
+            print("return_date ", return_date)
 
-        bookk.status = "Borrowed"
-        bookk.return_date = return_date
-        bookk.save()
+            bookk.status = "Borrowed"
+            bookk.return_date = return_date
+            bookk.save()
 
-        new_borrowed_book = BorrowedBook(
-            user = request.user,
-            book = bookk,
-            return_date = return_date,
-        )
+            new_borrowed_book = BorrowedBook(
+                user = request.user,
+                book = bookk,
+                return_date = return_date,
+            )
 
-        new_borrowed_book.save()
+            new_borrowed_book.save()
 
-        return JsonResponse({"status": "success"}, status=200)
+            return JsonResponse({"status": "success"}, status=200)
+        except ValueError:
+            return HttpResponseBadRequest("Invalid date format")
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=500)
     else:
         return JsonResponse({"status": "error"}, status=401)
 
@@ -119,6 +130,8 @@ def borrow_book_flutteeer(request, book_id:int):
         data = json.loads(request.body)
         bookk = Book.objects.get(pk=book_id)
         return_date = datetime.datetime.now()
+
+        print("date time now:", return_date)
 
         bookk.status = "Borrowed"
         bookk.return_date = return_date
